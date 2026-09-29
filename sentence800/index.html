@@ -222,6 +222,8 @@ textarea{width:100%;min-height:128px;resize:vertical;border:2.5px dashed var(--h
 .lvtabs button[aria-pressed="true"]{background:var(--hl);box-shadow:inset 0 0 0 2px var(--bd)}
 .kenav{display:flex;align-items:center;gap:var(--s2);font-family:var(--f-disp);font-size:16px}
 .kenav .btn{padding:2px 14px;font-size:20px}
+.stage .kenav .btn{font-size:15px;padding:4px 14px}
+.exno{font-family:var(--f-disp);font-variant-numeric:tabular-nums;min-width:48px;text-align:center}
 .ke-stage{--bd:var(--why-bd)}
 .kesteps{display:flex;gap:var(--s2);flex-wrap:wrap}
 .kesteps button{border:0;border-radius:999px;padding:3px 12px;font-family:var(--f-disp);font-size:14px;background:var(--soft);color:var(--muted);transition:transform .12s}
@@ -585,7 +587,8 @@ function renderList(){
 }
 $('#exList').addEventListener('click',e=>{const b=e.target.closest('.ex-btn');if(b)startEx(+b.dataset.i)});
 
-function startEx(i){cur={i,k:0,placed:[],bank:[],miss:0,hint:0,justAdded:0};makeBank();renderList();renderStage();store.set('last',i)}
+function startEx(i){cur={i,k:0,placed:[],bank:[],miss:0,hint:0,justAdded:0};makeBank();renderList();renderStage();store.set('last',i);
+  try{const b=document.querySelector('.ex-btn[aria-current="true"]');const l=$('#exList');if(b&&l.scrollWidth>l.clientWidth)l.scrollTo({left:b.offsetLeft-l.offsetLeft-16,behavior:'smooth'})}catch(e){}}
 
 function answerTokens(){
   const ex=EX[cur.i],step=cur.k+1;
@@ -640,7 +643,8 @@ function renderStage(){
   const finished=k>=total;
   const nowS=plainSentence(ex,k),baseW=wordCount(plainSentence(ex,0)),finalW=wordCount(plainSentence(ex,total)),nowW=wordCount(nowS);
   let h=`<div class="eyebrow"><span class="lvpill ${LVC[ex.lv]}">${LV[ex.lv][0]} · ${LV[ex.lv][1]} · ${cur.i+1}번 문장</span>
-    <span class="dots" aria-label="${k}/${total} 단계">${Array.from({length:total},(_,j)=>`<i class="${j<k?'on':''}"></i>`).join('')}</span></div>
+    <span class="dots" aria-label="${k}/${total} 단계">${Array.from({length:total},(_,j)=>`<i class="${j<k?'on':''}"></i>`).join('')}</span>
+    <span class="kenav"><button class="btn ghost sm" id="prevEx" aria-label="이전 문장">‹ 이전</button><span class="exno">${cur.i+1} / ${EX.length}</span><button class="btn ghost sm" id="nextEx" aria-label="다음 문장">다음 ›</button></span></div>
     <div style="display:grid;gap:8px">
       <p class="sentence" lang="en">${sentenceHTML(ex,k,!finished)}</p>
       <p class="ko">${ex.ko[k]}</p>
@@ -723,7 +727,8 @@ $('#stage').addEventListener('click',e=>{
       m.textContent=cur.placed.length<ans.length?`단어가 ${ans.length-cur.placed.length}개 더 필요해요.`:(cur.placed.length>ans.length?'필요 없는 단어가 들어 있어요.':'순서를 다시 생각해 보세요. 도구 모양을 참고해요.');
     }
   }
-  if(id==='next') startEx((cur.i+1)%EX.length);
+  if(id==='next'||id==='nextEx') startEx((cur.i+1)%EX.length);
+  if(id==='prevEx') startEx((cur.i-1+EX.length)%EX.length);
   if(id==='again') startEx(cur.i);
 });
 
