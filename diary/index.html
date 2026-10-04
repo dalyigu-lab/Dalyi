@@ -1,0 +1,1062 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+</head>
+<body>
+<title>지호의 일기 도우미</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gaegu:wght@400;700&family=Nanum+Pen+Script&family=Gowun+Dodum&display=swap">
+<style>
+/* 「달달맘의 글분석 학습지」와 같은 한 가지 모습(흰 종이 만화 카드)으로 만든 페이지: 배경과 글자색을 모두 직접 지정합니다.
+   Layout: 왼쪽에 달달쌤 말풍선(고정) + 오른쪽 단계 카드, 위에 동그라미 번호 단계 레일 */
+:root{
+  color-scheme:light;
+  --bg:#FFFFFF; --ink:#342A2A; --ink-2:#6C5F5F; --ink-3:#A89B9B;
+  --pink:#F5A3B7; --pink-soft:#FDE7ED; --pink-b:#EE9DB1;
+  --lav:#F6E3F4; --lav-b:#E2A6D7;
+  --lime:#EAF7CB; --peach:#FFF3E6; --peach-b:#F7CDA4;
+  --blue:#4568CF; --blue-soft:#EAF0FC; --coral:#E3544B;
+  --hl:#FFD2DC; --hl-y:#FFE7A3; --hl-g:#D9F0B8;
+  --ok:#3E9B58; --ok-soft:#E8F6DF;
+  --rule:#E3E9F7; --margin:#F6B7C4; --line:#E6DCDC; --star:#F5B73C; --sky:#9DC4F0;
+  --lh:38px;
+  --f-hand:'Gaegu','Gowun Dodum','Apple SD Gothic Neo','Malgun Gothic',sans-serif;
+  --f-pen:'Nanum Pen Script','Gaegu','Apple SD Gothic Neo',cursive;
+  --f-text:'Gowun Dodum','Apple SD Gothic Neo','Malgun Gothic','Noto Sans KR',sans-serif;
+}
+*{box-sizing:border-box}
+html,body{background:var(--bg);color:var(--ink)}
+body{word-break:keep-all;overflow-wrap:anywhere;font-family:var(--f-hand);font-size:19px;line-height:1.5;-webkit-font-smoothing:antialiased}
+button{font:inherit;color:inherit;cursor:pointer}
+input,textarea,select{font:inherit;color:var(--ink)}
+button:focus-visible,input:focus-visible,textarea:focus-visible,a:focus-visible{outline:3px solid var(--blue);outline-offset:3px}
+h1,h2,h3,h4{font-family:var(--f-hand);font-weight:700;text-wrap:balance;margin:0;line-height:1.15}
+p{margin:0}
+.wrap{max-width:1180px;margin:0 auto;padding-inline:16px;padding-block:18px 64px}
+.hl{background:linear-gradient(to bottom,transparent 55%,var(--hl) 55%,var(--hl) 92%,transparent 92%);padding:0 3px}
+.hl-y{background:linear-gradient(to bottom,transparent 55%,var(--hl-y) 55%,var(--hl-y) 92%,transparent 92%);padding:0 3px}
+.hl-g{background:linear-gradient(to bottom,transparent 55%,var(--hl-g) 55%,var(--hl-g) 92%,transparent 92%);padding:0 3px}
+.red{color:var(--coral)}
+.doodle{font-family:var(--f-pen);color:var(--coral);font-size:24px;line-height:1;display:inline-block;transform:rotate(-7deg);white-space:nowrap}
+.chr{display:block;flex:none;width:110px}
+.chr svg{display:block;width:100%;height:auto;overflow:visible}
+.bob{animation:bob 2.6s ease-in-out infinite}
+@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
+@keyframes pop{from{opacity:0;transform:scale(.97)}to{opacity:1;transform:none}}
+@keyframes stamp{0%{opacity:0;transform:scale(1.6) rotate(-20deg)}70%{opacity:1;transform:scale(.94) rotate(-10deg)}100%{transform:scale(1) rotate(-12deg)}}
+.circ{display:inline-grid;place-items:center;width:34px;height:34px;border:2.5px solid var(--ink);border-radius:50%;font-size:20px;flex:none;line-height:1}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+
+/* 버튼·칩 */
+.btn{border:2.5px solid var(--ink);background:#fff;border-radius:999px;padding:4px 18px;font-size:20px;font-weight:700;transition:transform .12s;display:inline-block;text-decoration:none;color:var(--ink);white-space:nowrap}
+.btn:hover{transform:translateY(-2px)} .btn:active{transform:none}
+.btn:disabled{opacity:.45;cursor:default;transform:none}
+.btn.pri{background:var(--coral);border-color:var(--coral);color:#fff}
+.btn.soft{background:var(--lime)}
+.btn.sm{font-size:17px;padding:2px 14px;border-width:2px}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.spacer{flex:1}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{display:inline-flex;align-items:center;gap:5px;border:2px solid #E4DADA;background:#fff;border-radius:999px;padding:1px 14px;font-size:19px;font-weight:700;transition:transform .1s,border-color .15s,background-color .15s;text-align:left}
+.chip:hover{border-color:var(--ink);transform:translateY(-1px)}
+.chip:active{transform:none}
+.chip[aria-pressed="true"]{background:var(--pink-soft);border-color:var(--coral);color:var(--coral)}
+.chip small{font-family:var(--f-text);font-size:12px;color:var(--ink-3);font-weight:400}
+.chip.y[aria-pressed="true"]{background:#FFF6D6;border-color:#E9B04A;color:#9A6A10}
+
+/* 첫 화면 */
+.hero{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);gap:14px 28px;align-items:end;padding-block:4px 14px}
+.kicker{font-size:17px;color:var(--ink-2)}
+.brand{font-size:clamp(44px,8vw,76px);line-height:1;margin-top:6px;letter-spacing:-.02em}
+.brand .red{white-space:nowrap}
+.sub{font-size:21px;margin-top:12px;font-weight:700}
+.hero-c{display:flex;align-items:flex-end;gap:8px;justify-content:center}
+.hero-c .bubble{max-width:290px}
+.home-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px;margin-top:6px}
+.week{border:2.5px solid var(--peach-b);border-radius:6px;padding:12px 18px 14px;background:#fff;display:flex;flex-direction:column;gap:10px}
+.week h3,.start h3{font-size:24px}
+.days{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:6px}
+.day{display:flex;flex-direction:column;align-items:center;gap:2px;font-size:18px}
+.day .dot{width:100%;max-width:58px;aspect-ratio:1;border:2.5px dashed var(--line);border-radius:50%;display:grid;place-items:center;position:relative}
+.day.today .dot{border-color:var(--coral);border-style:solid}
+.day .dot.on{border-style:solid;border-color:var(--coral);background:var(--pink-soft)}
+.day .dot.on::after{content:'참\A잘함';white-space:pre;font-family:var(--f-pen);color:var(--coral);font-size:18px;line-height:.95;text-align:center;transform:rotate(-12deg)}
+.day small{font-family:var(--f-text);font-size:12px;color:var(--ink-3)}
+.week p{font-family:var(--f-text);font-size:14px;color:var(--ink-2)}
+.start{border:2.5px solid var(--lav-b);background:var(--lav);border-radius:6px;padding:12px 18px 16px;display:flex;flex-direction:column;gap:10px}
+.start p{font-family:var(--f-text);font-size:15px;line-height:1.7}
+.start .row .btn{font-size:22px}
+.who{display:flex;align-items:center;gap:8px;font-size:18px;color:var(--ink-2)}
+.who input{width:5.5em;font-size:21px;font-weight:700;border:0;border-bottom:2.5px dashed var(--lav-b);background:transparent;padding:0 2px}
+.who input:focus{outline:none;border-bottom-color:var(--coral)}
+.shelf h3{font-size:28px;margin:26px 0 10px;display:flex;align-items:baseline;gap:10px}
+.shelf h3 small{font-family:var(--f-pen);font-size:22px;color:var(--ink-3);font-weight:400}
+.entries{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:14px}
+.ent{position:relative;display:flex;flex-direction:column;gap:4px;text-align:left;background:#fff;border:2.5px solid var(--c,var(--pink-b));border-radius:6px;padding:10px 14px 12px;transition:transform .15s;min-width:0}
+.ent:nth-child(4n+2){--c:var(--peach-b)} .ent:nth-child(4n+3){--c:var(--lav-b)} .ent:nth-child(4n+4){--c:var(--sky)}
+.ent:hover{transform:translateY(-3px) rotate(-.5deg)}
+.ent .dt{font-size:17px;color:var(--ink-2);display:flex;align-items:center;gap:6px}
+.ent .dt svg{width:24px;height:24px}
+.ent b{font-size:24px;line-height:1.15}
+.ent .snip{font-family:var(--f-text);font-size:13.5px;line-height:1.6;color:var(--ink-2);display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.ent .tag{font-size:15px;color:var(--ink-3)}
+.ent .ex{font-family:var(--f-pen);font-size:20px;color:var(--blue);line-height:1}
+.ent .st{position:absolute;right:8px;top:6px;font-family:var(--f-pen);color:var(--coral);font-size:18px;border:2px solid var(--coral);border-radius:50%;width:50px;height:50px;display:grid;place-items:center;line-height:.95;text-align:center;transform:rotate(12deg);opacity:.85}
+
+/* 단계 레일 */
+.top{display:flex;align-items:center;gap:8px 16px;flex-wrap:wrap;margin-bottom:10px}
+.top h1{font-size:30px}
+.rail-wrap{overflow-x:auto;margin-bottom:16px;scrollbar-width:thin}
+.steps{display:flex;gap:6px;padding:2px 2px 6px;min-width:max-content}
+.stp{font-size:18px;padding:2px 14px 2px 4px;border-radius:999px;border:2px solid #E6DEDE;color:var(--ink-3);white-space:nowrap;display:inline-flex;gap:6px;align-items:center;background:#fff;transition:transform .12s}
+.stp:hover{transform:translateY(-2px)}
+.stp b{display:inline-grid;place-items:center;width:26px;height:26px;border:2px solid currentColor;border-radius:50%;font-size:16px}
+.stp[aria-current="step"]{border-color:var(--coral);color:var(--coral);background:var(--pink-soft);font-weight:700}
+.stp.done{color:var(--ink);border-color:var(--ink-3)}
+.stp.done b{border-color:var(--coral);color:var(--coral)}
+
+.layout{display:grid;grid-template-columns:270px minmax(0,1fr);gap:24px;align-items:start}
+.teacher{position:sticky;top:calc(env(safe-area-inset-top,0px) + 12px);display:flex;flex-direction:column;gap:10px}
+.tface{display:flex;gap:8px;align-items:flex-end}
+.tface .chr{width:100px}
+.tname h3{font-size:28px}
+.tname small{display:block;font-family:var(--f-pen);font-size:21px;color:var(--coral);line-height:1.1}
+.bubble{position:relative;background:var(--lime);border:2.5px solid var(--ink);border-radius:26px;padding:12px 18px;font-size:20px;font-weight:700;line-height:1.45}
+.teacher .bubble::after{content:'';position:absolute;left:40px;top:-11px;width:18px;height:18px;background:inherit;border-left:2.5px solid var(--ink);border-top:2.5px solid var(--ink);transform:rotate(40deg) skewX(-6deg)}
+.hero-c .bubble::after{content:'';position:absolute;left:-10px;bottom:22px;width:18px;height:18px;background:inherit;border-left:2.5px solid var(--ink);border-bottom:2.5px solid var(--ink);transform:rotate(30deg) skewX(-10deg)}
+.bubble p+p{margin-top:6px}
+.bubble b{color:var(--coral)}
+.momsend{display:flex;align-items:center;gap:10px;padding:10px 12px;border:2.5px solid var(--pink-b);background:var(--pink-soft);border-radius:10px}
+.momsend > div{flex:1;display:grid;min-width:0}
+.momsend b{font-size:20px} .momsend span{font-size:14px;color:var(--ink-2);font-family:var(--f-text)}
+
+/* 카드 */
+.card{position:relative;background:#fff;border:2.5px solid var(--peach-b);border-radius:6px;padding:16px 18px 18px;display:flex;flex-direction:column;gap:14px;animation:pop .2s ease;min-width:0}
+.card > h2{font-size:34px;display:flex;align-items:center;gap:10px}
+.card h3{font-size:24px}
+.lead{font-family:var(--f-text);font-size:15px;color:var(--ink-2);line-height:1.7}
+.nav{display:flex;gap:8px;justify-content:space-between;margin-top:4px}
+.box{border:2px dashed var(--peach-b);background:var(--peach);border-radius:8px;padding:10px 14px;display:flex;flex-direction:column;gap:8px}
+.box.lav{border-color:var(--lav-b);background:var(--lav)}
+.box.pink{border-color:var(--pink-b);background:var(--pink-soft)}
+.box h4{font-size:21px}
+.box ul{margin:0;padding-left:20px;font-family:var(--f-text);font-size:15.5px;line-height:1.8}
+.status{font-family:var(--f-pen);font-size:22px;color:var(--coral);min-height:1.2em}
+
+/* ① 날짜 */
+.datebig{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap}
+.datebig b{font-size:clamp(34px,6vw,48px);line-height:1}
+.datebig input{font-family:var(--f-text);font-size:16px;border:2px dashed var(--peach-b);border-radius:8px;padding:4px 10px;background:var(--peach)}
+.wx{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.wbtn{display:flex;flex-direction:column;align-items:center;gap:2px;border:2.5px solid var(--line);border-radius:10px;padding:8px 4px;background:#fff;font-size:18px;font-weight:700;transition:transform .12s,border-color .15s}
+.wbtn svg{width:52px;height:52px}
+.wbtn:hover{transform:translateY(-2px);border-color:var(--ink)}
+.wbtn[aria-pressed="true"]{border-color:var(--coral);background:var(--pink-soft)}
+.field{display:grid;gap:4px;font-size:19px;font-weight:700}
+.field input,.field textarea{width:100%;font-family:var(--f-text);font-size:16px;font-weight:400;line-height:1.6;border:2px dashed var(--peach-b);border-radius:8px;padding:7px 10px;background:var(--peach)}
+.field input:focus,.field textarea:focus{outline:none;border-style:solid;border-color:var(--coral);background:#fff}
+.field textarea{min-height:64px;resize:vertical}
+
+.must{display:inline-block;background:var(--coral);color:#fff;font-size:15px;border-radius:999px;padding:0 10px;vertical-align:middle}
+.chip.wl{font-size:18px}
+.chip.wl[aria-pressed="true"]{background:#FFF6D6;border-color:#E9B04A;color:var(--ink)}
+.wown{width:100%;font-family:var(--f-text);font-size:16px;line-height:1.6;border:2px dashed var(--peach-b);border-radius:8px;padding:7px 10px;background:#fff}
+.wown:focus{outline:none;border-style:solid;border-color:var(--coral)}
+.wown.bad{border-color:var(--coral)}
+.wxmsg{font-family:var(--f-pen);font-size:22px;color:var(--ink-2);line-height:1.2}
+.wxmsg.ok{color:var(--ok)} .wxmsg.no{color:var(--coral)}
+.titlein.need{background:var(--pink-soft);border-bottom:3px dashed var(--coral)}
+.tneed{font-family:var(--f-pen);font-size:22px;color:var(--coral);padding:4px 14px 0;background:#fff}
+/* ② 주제 */
+.tgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px}
+.tg{border:2.5px solid var(--line);border-radius:10px;padding:10px 12px;display:flex;flex-direction:column;gap:6px;background:#fff}
+.tg.on{border-color:var(--coral);background:#FFFAFB}
+.tg h3{font-size:23px;display:flex;align-items:center;gap:8px}
+.tg h3 small{font-family:var(--f-pen);font-size:19px;color:var(--ink-3);font-weight:400}
+.tg .chips .chip{font-size:17px}
+.dice{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.talk{display:flex;gap:10px;align-items:flex-start}
+.talk .chr{width:70px}
+.talk ol{margin:0;padding-left:22px;font-size:20px;display:grid;gap:2px}
+
+/* ③ 양식 */
+.forms{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:12px}
+.fm{position:relative;display:flex;flex-direction:column;gap:4px;text-align:left;border:2.5px solid var(--line);border-radius:10px;padding:10px 14px 12px;background:#fff;transition:transform .12s,border-color .15s}
+.fm:hover{transform:translateY(-2px);border-color:var(--ink)}
+.fm[aria-pressed="true"]{border-color:var(--coral);background:var(--pink-soft)}
+.fm b{font-size:24px;line-height:1.1}
+.fm span{font-family:var(--f-text);font-size:14px;line-height:1.6;color:var(--ink-2)}
+.fm em{font-style:normal;font-family:var(--f-pen);font-size:20px;color:var(--blue)}
+.fm .rec{position:absolute;right:10px;top:-12px;background:var(--coral);color:#fff;font-size:15px;border-radius:999px;padding:0 10px}
+.fm .mini{height:46px;border-radius:6px;background:repeating-linear-gradient(to bottom,#fff 0 13px,var(--rule) 13px 15px);border:1.5px solid var(--line);position:relative;overflow:hidden}
+.fm .mini i{position:absolute;font-style:normal;font-size:13px;color:var(--coral);font-family:var(--f-text)}
+
+/* ④ 재료 */
+.q{display:grid;gap:6px;padding:10px 0;border-bottom:2px dashed var(--line)}
+.q:last-of-type{border-bottom:0}
+.q label{font-size:21px;font-weight:700;display:flex;align-items:center;gap:8px}
+.q label .circ{width:30px;height:30px;font-size:17px}
+.q input,.q textarea{width:100%;font-family:var(--f-text);font-size:16px;line-height:1.6;border:2px dashed var(--peach-b);border-radius:8px;padding:6px 10px;background:var(--peach)}
+.q textarea{min-height:58px;resize:vertical}
+.q input:focus,.q textarea:focus{outline:none;border-style:solid;border-color:var(--coral);background:#fff}
+.q .ex{font-family:var(--f-text);font-size:13px;color:var(--ink-3)}
+.blank-sent{font-family:var(--f-text);font-size:17px;line-height:2.4}
+.blank-sent input{font-family:var(--f-text);font-size:16px;border:0;border-bottom:2.5px solid var(--ink);background:var(--hl-y);border-radius:4px 4px 0 0;padding:1px 6px;width:9em;max-width:100%;text-align:center}
+.blank-sent input:focus{outline:none;background:var(--hl);border-bottom-color:var(--coral)}
+.blank-sent li{margin-bottom:2px}
+.blank-sent ol{margin:0;padding-left:22px}
+.stars{display:inline-flex;gap:2px}
+.stars button{border:0;background:none;padding:0 2px;font-size:32px;line-height:1;color:var(--line)}
+.stars button.on{color:var(--star)}
+.bq{font-size:22px;font-weight:700;line-height:1.4}
+.feel-tabs{display:flex;flex-wrap:wrap;gap:6px}
+.feel-tabs button{border:2.5px solid var(--ink);background:#fff;border-radius:999px;padding:2px 14px;font-size:19px;font-weight:700}
+.feel-tabs button[aria-pressed="true"]{background:var(--ink);color:#fff}
+
+/* 그림판 */
+.pad{display:flex;flex-direction:column;gap:8px}
+.cw{position:relative;width:100%;max-width:620px;aspect-ratio:3/2;border:2.5px solid var(--ink);border-radius:4px;background:#fff;touch-action:none;overflow:hidden}
+.cw canvas{position:absolute;inset:0;width:100%;height:100%}
+.pens{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.sw{width:30px;height:30px;border-radius:50%;border:2px solid var(--ink)}
+.sw[aria-pressed="true"]{outline:3px solid var(--coral);outline-offset:2px}
+.tool{border:2px solid var(--ink);background:#fff;border-radius:8px;padding:0 10px;font-size:17px;font-weight:700;min-height:32px}
+.tool[aria-pressed="true"]{background:var(--ink);color:#fff}
+
+/* ⑤ 쓰기 */
+.wlayout{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:16px;align-items:start}
+.note{background:#fff;border:2.5px solid var(--blue);border-radius:4px;display:flex;flex-direction:column;min-width:0}
+.note .nh{display:flex;flex-wrap:wrap;gap:4px 14px;align-items:center;padding:8px 12px;border-bottom:2px dashed #C9D5F2;background:var(--blue-soft);font-size:18px}
+.note .nh svg{width:28px;height:28px}
+.titlein{width:100%;border:0;border-bottom:2.5px solid var(--ink);font-family:var(--f-hand);font-size:28px;font-weight:700;padding:6px 14px 2px;background:#fff}
+.titlein:focus{outline:none;border-bottom-color:var(--coral)}
+.titlein::placeholder,.paper::placeholder{color:var(--ink-3);font-weight:400}
+.tsug{display:flex;flex-wrap:wrap;gap:6px;padding:8px 12px;border-bottom:2px dashed #E3E9F7;align-items:center}
+.tsug span{font-family:var(--f-pen);font-size:20px;color:var(--coral)}
+.tsug .chip{font-size:16px}
+.paper{display:block;width:100%;min-height:calc(var(--lh) * 11);border:0;resize:vertical;padding:4px 14px 14px 52px;font-family:var(--f-text);font-size:18px;line-height:var(--lh);background-color:#fff;
+  background-image:linear-gradient(to right,transparent 40px,var(--margin) 40px,var(--margin) 42px,transparent 42px),linear-gradient(to bottom,transparent calc(var(--lh) - 1.5px),var(--rule) calc(var(--lh) - 1.5px));
+  background-size:100% 100%,100% var(--lh);background-position:0 0,0 4px;background-attachment:local}
+.paper:focus{outline:none}
+.nfoot{display:flex;flex-wrap:wrap;gap:6px 14px;align-items:center;justify-content:space-between;padding:6px 12px;border-top:2px dashed #C9D5F2;font-size:18px;color:var(--ink-2)}
+.nfoot b{color:var(--ink);font-size:22px}
+.tool-p{background:#fff;border:2.5px solid var(--lav-b);border-radius:6px;display:flex;flex-direction:column;min-width:0;position:sticky;top:calc(env(safe-area-inset-top,0px) + 12px);max-height:calc(100vh - 24px)}
+.tool-p .th{padding:8px 12px 0;display:flex;flex-direction:column;gap:6px}
+.tool-p .th h3{font-size:24px;display:flex;align-items:baseline;gap:8px}
+.tool-p .th h3 small{font-family:var(--f-pen);font-size:19px;color:var(--coral);font-weight:400}
+.tabs{display:flex;flex-wrap:wrap;gap:5px;padding-bottom:8px;border-bottom:2px dashed var(--lav-b)}
+.tabs button{border:2px solid var(--ink);background:#fff;border-radius:8px;padding:0 10px;font-size:17px;font-weight:700}
+.tabs button[aria-selected="true"]{background:var(--ink);color:#fff}
+.tbody{overflow:auto;padding:10px 12px 14px;display:flex;flex-direction:column;gap:10px;min-height:0}
+.grp h4{font-size:19px;margin-bottom:4px;color:var(--ink-2)}
+.grp .chip{font-size:17px}
+.hint-t{font-family:var(--f-text);font-size:13.5px;line-height:1.6;color:var(--ink-2)}
+.search{width:100%;font-family:var(--f-text);font-size:15px;border:2px dashed var(--lav-b);border-radius:999px;padding:5px 14px;background:var(--lav)}
+.search:focus{outline:none;border-style:solid;border-color:var(--coral);background:#fff}
+.idl{display:flex;flex-direction:column;gap:6px}
+.idi{border:2px solid #E9E0E8;border-radius:8px;background:#fff}
+.idi > button{width:100%;text-align:left;border:0;background:none;padding:6px 10px;display:flex;align-items:baseline;gap:8px;font-size:19px;font-weight:700;flex-wrap:wrap}
+.idi > button small{font-family:var(--f-text);font-size:13px;color:var(--ink-3);font-weight:400}
+.idi .hz{font-family:var(--f-text);font-size:14px;color:var(--blue);font-weight:400}
+.idi .dd{padding:0 10px 10px;display:flex;flex-direction:column;gap:6px;font-family:var(--f-text);font-size:14.5px;line-height:1.7}
+.idi .dd .exs{background:var(--peach);border-radius:6px;padding:6px 10px}
+.idi .dd .exs::before{content:'일기 예문 ';font-family:var(--f-pen);font-size:19px;color:var(--coral)}
+.idi .dd .story{color:var(--ink-2)}
+.idi.open{border-color:var(--lav-b)}
+.stuck{display:flex;flex-direction:column;gap:6px}
+.stuck .chk{display:flex;gap:8px;align-items:center;font-family:var(--f-text);font-size:15px}
+.stuck .chk i{font-style:normal;width:20px;text-align:center}
+
+/* ⑥ 완성 */
+.done-top{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px;align-items:start}
+.checks{list-style:none;margin:0;padding:0;display:grid;gap:6px}
+.checks li{display:flex;gap:10px;align-items:center;font-size:20px}
+.cb{width:26px;height:26px;flex:none;position:relative;border:2.5px solid var(--ink);border-radius:3px;background:#fff}
+.cb.on::after{content:'';position:absolute;left:3px;top:-10px;width:12px;height:22px;border-right:4px solid var(--coral);border-bottom:4px solid var(--coral);transform:rotate(40deg);border-radius:2px}
+.checks li small{font-family:var(--f-text);font-size:13px;color:var(--ink-3)}
+.checks label{display:flex;gap:10px;align-items:center;cursor:pointer}
+.checks input{position:absolute;opacity:0;width:1px;height:1px}
+.checks input:focus-visible + .cb{outline:3px solid var(--blue);outline-offset:3px}
+.award{display:flex;align-items:center;gap:16px;flex-wrap:wrap;border:2.5px solid var(--pink-b);background:var(--pink-soft);border-radius:10px;padding:12px 16px}
+.bigstar{font-size:44px;letter-spacing:2px;color:var(--star);line-height:1}
+.bigstar .off{color:var(--line)}
+.stampbig{width:100px;height:100px;flex:none;border:3.5px solid var(--coral);border-radius:50%;display:grid;place-items:center;text-align:center;font-family:var(--f-pen);color:var(--coral);font-size:24px;line-height:.95;transform:rotate(-12deg);animation:stamp .5s ease both}
+.used{display:flex;flex-wrap:wrap;gap:6px}
+.used span{font-size:16px;border-radius:999px;padding:0 10px;background:var(--hl-g)}
+.used span.p{background:var(--hl-y)} .used span.c{background:var(--blue-soft)} .used span.f{background:var(--hl)}
+
+.wu-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;align-items:start}
+.wu-grid .box{min-width:0}
+.wu-grid .q input{background:#fff}
+.wu-grid .chip{font-size:16px}
+.memos{list-style:none;margin:0;padding:0;display:grid;gap:6px}
+.memos li{display:flex;align-items:center;gap:6px;background:#fff;border:2px solid var(--line);border-radius:8px;padding:4px 8px}
+.memos label{display:flex;align-items:center;gap:10px;flex:1;min-width:0;cursor:pointer;font-size:19px}
+.memos input{position:absolute;opacity:0;width:1px;height:1px}
+.memos input:focus-visible + .cb{outline:3px solid var(--blue);outline-offset:3px}
+.memos li.done .mt{text-decoration:line-through;color:var(--ink-3)}
+.mdel{border:0;background:none;font-size:22px;color:var(--ink-3);padding:0 6px;line-height:1}
+.mdel:hover{color:var(--coral)}
+.memo-home{grid-column:1/-1;border:2.5px solid var(--pink-b);background:var(--pink-soft);border-radius:6px;padding:12px 18px 14px;display:flex;flex-direction:column;gap:8px}
+.memo-home h3{font-size:24px;display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 10px}
+.memo-home h3 small{font-family:var(--f-pen);font-size:20px;color:var(--coral);font-weight:400}
+.memo-home .memos{grid-template-columns:repeat(auto-fill,minmax(200px,1fr))}
+.wu-page{border-top:2px dashed var(--line);padding-top:10px;display:flex;flex-direction:column;gap:8px}
+.wu-page h4{font-size:22px}
+.wu-page dl{margin:0;display:grid;gap:4px}
+.wu-page dl div{display:grid;grid-template-columns:8.5em minmax(0,1fr);gap:8px;align-items:baseline}
+.wu-page dt{font-size:17px;color:var(--coral);font-weight:700}
+.wu-page dd{margin:0;font-family:var(--f-text);font-size:15px;line-height:1.6}
+.wu-memo ul{margin:4px 0 0;padding:0;list-style:none;font-family:var(--f-text);font-size:15px;display:flex;flex-wrap:wrap;gap:4px 14px}
+@media (max-width:980px){.wu-grid{grid-template-columns:minmax(0,1fr)}}
+@media (max-width:480px){.wu-page dl div{grid-template-columns:minmax(0,1fr);gap:0}}
+/* 일기장 미리보기 (깍두기 공책) */
+.dpage{background:#fff;border:2.5px solid var(--ink);border-radius:6px;padding:14px 16px 18px;display:flex;flex-direction:column;gap:10px;min-width:0}
+.dhead{display:flex;flex-wrap:wrap;gap:4px 16px;align-items:center;font-size:20px;border-bottom:2px solid var(--ink);padding-bottom:6px}
+.dhead svg{width:30px;height:30px}
+.dhead .wl{font-family:var(--f-pen);font-size:22px;color:var(--ink-2)}
+.dpic{width:100%;max-width:520px;aspect-ratio:3/2;border:2px solid var(--ink);border-radius:4px;background:#fff;align-self:center}
+.dpic img{width:100%;height:100%;object-fit:contain;display:block}
+.dtitle{font-size:28px;text-align:center}
+.dtitle small{display:block;font-family:var(--f-text);font-size:13px;color:var(--ink-3);font-weight:400}
+.grid-note{display:grid;grid-template-columns:repeat(var(--cols,14),minmax(0,1fr));border-top:1.5px solid #D9C9C9;border-left:1.5px solid #D9C9C9}
+.grid-note span{aspect-ratio:1;border-right:1.5px solid #D9C9C9;border-bottom:1.5px solid #D9C9C9;display:grid;place-items:center;font-family:var(--f-text);font-size:clamp(13px,3.6vw,19px);line-height:1;min-width:0}
+.bookline{font-family:var(--f-text);font-size:14px;color:var(--ink-2)}
+
+/* 창 */
+.modal{position:fixed;inset:0;background:rgba(52,42,42,.35);z-index:50;display:grid;place-items:center;padding:16px;animation:pop .15s ease}
+.mbox{background:#fff;border:3px solid var(--ink);border-radius:14px;max-width:620px;width:100%;max-height:calc(100% - 8px);overflow:auto;padding:16px 18px 18px;display:flex;flex-direction:column;gap:10px}
+.mtop{display:flex;align-items:flex-end;gap:6px}
+.mtop .chr{width:78px}
+.mtop .bubble{flex:1;margin-left:10px;font-size:21px;background:var(--pink-soft);border-color:var(--pink-b);border-radius:18px}
+.send-steps{list-style:none;margin:0;padding:0;display:grid;gap:4px;font-size:19px}
+.send-steps li{display:flex;align-items:center;gap:8px}
+.send-steps .circ{width:28px;height:28px;font-size:17px}
+.mbox textarea{width:100%;min-height:200px;font-family:var(--f-text);font-size:14.5px;line-height:1.6;border:2px dashed var(--peach-b);border-radius:8px;padding:10px;background:var(--peach);resize:vertical}
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:#fff;border:2.5px solid var(--ink);border-radius:999px;padding:6px 20px;font-size:20px;font-weight:700;z-index:60;white-space:nowrap;max-width:calc(100% - 32px);overflow:hidden;text-overflow:ellipsis;animation:pop .2s ease}
+
+@media (max-width:980px){
+  .wlayout{grid-template-columns:minmax(0,1fr)}
+  .tool-p{position:relative;top:0;max-height:none}
+  .tool-p .tbody{max-height:420px}
+}
+@media (max-width:860px){
+  .layout{grid-template-columns:minmax(0,1fr);gap:12px}
+  .teacher{position:static;display:grid;grid-template-columns:64px minmax(0,1fr);gap:8px;align-items:start}
+  .tname{display:none}
+  .tface .chr{width:64px}
+  .teacher .bubble{font-size:17px;padding:10px 14px;border-radius:18px}
+  .teacher .bubble::after{display:none}
+  .momsend{grid-column:1/-1;padding:6px 10px}
+  .momsend span{display:none}
+  .hero{grid-template-columns:minmax(0,1fr)}
+  .hero-c .chr{width:84px}
+  .hero-c .bubble{font-size:18px}
+  .home-grid,.done-top{grid-template-columns:minmax(0,1fr)}
+  .wbtn svg{width:40px;height:40px}
+  .wbtn{font-size:16px}
+}
+@media (max-width:480px){
+  .card{padding:14px 12px 16px}
+  .card > h2{font-size:28px}
+  .paper{padding-left:40px;font-size:17px;--lh:36px;background-image:linear-gradient(to right,transparent 30px,var(--margin) 30px,var(--margin) 32px,transparent 32px),linear-gradient(to bottom,transparent calc(var(--lh) - 1.5px),var(--rule) calc(var(--lh) - 1.5px))}
+  .days{gap:3px}
+}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{transition:none!important;animation:none!important}}
+</style>
+
+<div class="wrap" id="app"></div>
+<div id="layer"></div>
+
+<script>
+(function(){
+const $=s=>document.querySelector(s);
+const $$=s=>[...document.querySelectorAll(s)];
+const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const pick=a=>a[Math.floor(Math.random()*a.length)];
+const LS='jiho-diary-helper-v1';
+
+/* ---------- 받침 · 조사 ---------- */
+function jong(w){w=String(w||'').trim().replace(/[\s.,!?~…”“"’‘')\]』」]+$/,'');if(!w)return 0;const c=w.charCodeAt(w.length-1);if(c<0xAC00||c>0xD7A3)return 0;return (c-0xAC00)%28}
+function P(w,t){const j=jong(w),b=j>0;return({
+  '을':b?'을':'를','이':b?'이':'가','은':b?'은':'는','와':b?'과':'와','으로':(b&&j!==8)?'으로':'로',
+  '이다':b?'이다':'다','이랑':b?'이랑':'랑','이라는':b?'이라는':'라는','아':b?'아':'야'})[t]||''}
+const end=s=>{s=String(s||'').trim();if(!s)return '';return /[.!?~…”"']$/.test(s)?s:s+'.'};
+
+/* ---------- 데이터 ---------- */
+const WD=['일','월','화','수','목','금','토'];
+const WEATHER=[
+ ['sun','맑음',['햇볕이 {쨍쨍} 내리쬔 날','해님이 {방긋방긋} 웃어 준 날','햇살이 {반짝반짝} 빛난 날','하늘이 {새파랗게} 맑았던 날','햇볕이 등을 {따끈따끈} 데워 준 날','구름 한 점 없이 {말갛게} 갠 날'],['쨍쨍','방긋방긋','반짝반짝','새파랗게','따끈따끈','말갛게','눈부시게']],
+ ['hot','더움',['{너무너무} 더워서 땀을 {뻘뻘} 흘린 날','땀이 {주르륵} 등을 타고 흘러내린 날','아이스크림이 {줄줄} 녹아내린 날','얼굴이 {후끈후끈} 달아오른 날','숨이 {헉헉} 막히게 더운 날','매미가 {맴맴} 울어 대던 무더운 날'],['뻘뻘','주르륵','줄줄','후끈후끈','헉헉','끈적끈적','푹푹']],
+ ['partly','구름 조금',['구름이 {둥실둥실} 떠다닌 날','해님이 구름 뒤에서 {빼꼼} 얼굴을 내민 날','솜사탕 구름이 {몽글몽글} 피어난 날','구름 사이로 햇살이 {살짝살짝} 비친 날'],['둥실둥실','빼꼼','몽글몽글','살짝살짝','뭉게뭉게']],
+ ['cloud','흐림',['회색 구름이 하늘을 {잔뜩} 덮은 날','하늘이 {꾸물꾸물} 흐렸던 날','금방 비가 올 것처럼 {우중충}했던 날','해님이 구름 속에 {꼭꼭} 숨어 버린 날','하늘이 {뿌옇게} 흐렸던 날'],['잔뜩','꾸물꾸물','우중충','꼭꼭','뿌옇게','어둑어둑']],
+ ['rain','비',['비가 {주룩주룩} 쏟아진 날','빗방울이 우산 위에서 {톡톡} 노래한 날','웅덩이를 {첨벙첨벙} 밟고 다닌 날','비가 {보슬보슬} 내린 날','천둥이 {우르르 쾅쾅} 친 날','옷이 비에 {흠뻑} 젖은 날'],['주룩주룩','톡톡','첨벙첨벙','보슬보슬','우르르 쾅쾅','흠뻑','후드득']],
+ ['cold','추움',['{너무너무} 추워서 {오들오들} 떨었던 날','손이 {꽁꽁} 얼어 버린 날','찬 바람에 볼이 {얼얼}했던 날','이가 {덜덜} 떨릴 만큼 추운 날','입김이 {호호} 하얗게 나온 날','몸이 {으슬으슬} 추웠던 날'],['오들오들','꽁꽁','얼얼','덜덜','호호','으슬으슬','쌀쌀']],
+ ['snow','눈',['함박눈이 {펑펑} 내린 날','눈이 {소복소복} 쌓인 날','눈을 {뽀드득뽀드득} 밟은 날','눈송이가 {팔랑팔랑} 춤춘 날','온 세상이 {새하얗게} 변한 날'],['펑펑','소복소복','뽀드득뽀드득','팔랑팔랑','새하얗게','사뿐사뿐']],
+ ['wind','바람',['바람이 {쌩쌩} 불어 댄 날','바람이 {살랑살랑} 불어 시원한 날','모자가 {휙} 날아갈 뻔한 날','나뭇잎이 {우수수} 떨어진 날','창문이 {덜컹덜컹} 흔들린 날','머리카락이 {휘휘} 날린 날'],['쌩쌩','살랑살랑','휙','우수수','덜컹덜컹','휘잉','솔솔']]];
+const wPlain=x=>x.replace(/[{}]/g,'');
+const wMark=x=>esc(x).replace(/\{([^}]+)\}/g,'<span class="hl-y">$1</span>');
+const WXEXTRA=['너무너무','너무','정말','엄청','무척','몹시','아주','잔뜩','흠뻑','살짝','쨍','휙','확','씽씽','방긋','꽁꽁'];
+const WXWORDS=[...WEATHER.flatMap(w=>[...w[2].flatMap(x=>(x.match(/\{([^}]+)\}/g)||[]).map(y=>y.slice(1,-1))),...w[3]]),...WXEXTRA];
+function wxWord(s){s=String(s||'');if(!s.trim())return '';
+  const hit=WXWORDS.filter(w=>s.includes(w)).sort((a,b)=>b.length-a.length)[0];if(hit)return hit;
+  const m=s.match(/([가-힣]{1,3})\1/);return m?m[0]:''}
+function wIcon(k){const S='stroke="#342A2A" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"';
+  const sun=(x,y,r)=>`<circle cx="${x}" cy="${y}" r="${r}" fill="#FFD66B" ${S}/>`+[0,45,90,135,180,225,270,315].map(a=>{const t=a*Math.PI/180;return `<path d="M${(x+Math.cos(t)*(r+4)).toFixed(1)} ${(y+Math.sin(t)*(r+4)).toFixed(1)} L${(x+Math.cos(t)*(r+9)).toFixed(1)} ${(y+Math.sin(t)*(r+9)).toFixed(1)}" ${S}/>`}).join('');
+  const cloud=(dx,dy,f)=>`<path d="M${14+dx} ${44+dy} q-10 0 -10 -9 q0 -9 10 -9 q2 -11 14 -11 q11 0 14 10 q11 -1 11 10 q0 9 -10 9z" fill="${f||'#fff'}" ${S}/>`;
+  const body={sun:sun(32,32,12),partly:sun(40,22,9)+cloud(-2,8),cloud:cloud(4,0,'#E9EDF5')+'',
+   rain:cloud(4,-6,'#E9EDF5')+`<path d="M20 50 l-3 7 M32 50 l-3 7 M44 50 l-3 7" stroke="#4568CF" stroke-width="2.6" stroke-linecap="round"/>`,
+   snow:cloud(4,-6,'#fff')+`<g fill="#9DC4F0" ${S}><circle cx="19" cy="53" r="3"/><circle cx="32" cy="57" r="3"/><circle cx="45" cy="53" r="3"/></g>`,
+   hot:sun(28,28,11)+`<path d="M50 34 q6 9 0 13 q-6 -4 0 -13z" fill="#9CC8F2" ${S}/><path d="M40 50 q5 7 0 10 q-5 -3 0 -10z" fill="#9CC8F2" ${S}/>`,
+   cold:`<g ${S} fill="none" stroke="#4568CF"><path d="M24 10 v40 M7 20 l34 20 M7 40 l34 -20"/><path d="M19 12 l5 5 l5 -5 M19 48 l5 -5 l5 5"/></g><rect x="46" y="12" width="9" height="30" rx="4.5" fill="#fff" ${S}/><circle cx="50.5" cy="47" r="7" fill="#9CC8F2" ${S}/>`,
+   wind:`<path d="M8 24 h30 q8 0 8 -7 q0 -6 -6 -6 q-5 0 -6 5 M8 36 h40 q9 0 9 8 q0 7 -7 7 q-6 0 -7 -6 M8 48 h20" fill="none" ${S}/>`}[k]||'';
+  return `<svg viewBox="0 0 64 64" aria-hidden="true">${body}</svg>`}
+
+const TOPICS=[
+ {t:'오늘 있었던 일',s:'작은 순간 하나',ideas:['친구가 한 말이나 내가 한 말','급식 시간에 있었던 일','오늘 웃겼던 일'],q:['언제 있었던 일이야?','누가 있었어?','그때 기분이 어땠어?','그때 뭐가 보였어?'],form:'six'},
+ {t:'오늘 좋았던 것',s:'좋았던 순간 하나',ideas:['오늘 가장 맛있었던 것','가장 재미있었던 놀이','다시 하고 싶은 일'],q:['뭐가 제일 좋았어?','언제 그랬어?','어떤 점이 좋았어?','무슨 맛이었어?'],form:'six'},
+ {t:'오늘 상상한 것',s:'본 것에서 시작',ideas:['오늘 본 동물이 말을 한다면','내 가방 속 물건이 살아난다면','오늘 갔던 곳에 비밀 문이 생긴다면'],q:['무엇을 보고 상상했어?','그게 정말 일어나면 제일 먼저 뭘 할 거야?','그다음엔 무슨 일이 생길까?','무슨 소리가 날 것 같아?'],form:'imagine'},
+ {t:'오늘 바랐던 것',s:'작은 마음 하나',ideas:['오늘 더 하고 싶었던 일','하지 못해 아쉬웠던 일','내일은 달랐으면 하는 일'],q:['왜 그러고 싶었어?','언제 그런 생각이 들었어?','다음엔 어떻게 하고 싶어?','몸은 어떤 느낌이었어?'],form:'free'},
+ {t:'마음에 남은 것',s:'떠오르는 장면',ideas:['오늘 읽은 책 속 장면','오늘 기억에 남은 말','집에 와서도 생각난 일'],q:['왜 그 장면이 기억났어?','그때 기분이 어땠어?','비슷한 적이 있었어?','무슨 냄새가 났어?'],form:'free',ff:{0:'book'}},
+ {t:'특별한 일',s:'빈칸만 채우면 끝',ideas:['오늘 있었던 중요한 일','친구와 있었던 일','칭찬받은 일','문제를 해결한 일','새로 배운 것','견학이나 체험'],q:['그 일이 언제, 어디서 있었어?','누구랑 같이 있었어?','제일 기억나는 장면은?','다음엔 어떻게 하고 싶어?'],form:'blank'},
+ {t:'마음 전하기',s:'편지처럼 써요',ideas:['고마운 사람','미안한 일이 있는 사람','보고 싶은 사람'],q:['누구에게 쓰고 싶어?','왜 그 사람이 떠올랐어?','오늘 그 사람과 무슨 일이 있었어?','꼭 하고 싶은 말은?'],form:'letter'}
+];
+const FORMS=[
+ {k:'six',t:'육하원칙 일기',d:'누가·언제·어디서·무엇을·어떻게·왜 여섯 질문에 답하면 일기가 돼요.',good:'무슨 일이 있었는지 쓸 때',m:['누가?','언제?','어디서?']},
+ {k:'blank',t:'빈칸 채우기 일기',d:'다섯 문장 틀에 빈칸만 채워요. 쓰기 힘든 날 딱이에요.',good:'처음 쓰거나 쓰기 힘든 날',m:['오늘 ____에','____을 했다.']},
+ {k:'pic',t:'그림일기',d:'오늘 장면을 그리고 육하원칙으로 짧게 써요.',good:'그림으로 먼저 생각할 때',m:['[그림]','누가? 어디서?']},
+ {k:'book',t:'독서 일기',d:'책 제목, 기억에 남는 장면, 독후 질문 하나에 답해요.',good:'책을 읽은 날',m:['도서명','기억에 남는 장면']},
+ {k:'imagine',t:'상상 일기',d:'“만약에~”로 시작해서 이야기를 지어요.',good:'특별한 일이 없는 날',m:['만약에…','그다음엔?']},
+ {k:'letter',t:'편지 일기',d:'오늘 있었던 일을 누군가에게 편지로 들려줘요.',good:'마음을 전하고 싶을 때',m:['사랑하는 엄마께','… 올림']},
+ {k:'free',t:'처음·가운데·끝 일기',d:'처음(무슨 일) → 가운데(자세히) → 끝(생각·다짐) 차례로 써요.',good:'혼자 길게 써 보고 싶을 때',m:['처음','가운데','끝']}
+];
+const FK=Object.fromEntries(FORMS.map(f=>[f.k,f]));
+
+/* 일기 쓰기 가이드(초3·4학년용) 빈칸 틀: {힌트} 빈칸, [을] 앞 빈칸에 맞춘 조사 */
+const GUIDE=[
+ ['오늘 있었던 중요한 일',['오늘 {시간}에 일어나서 {무엇}[을] 했다.','{장소}에서 {누구}[을] 만나 {활동}[을] 했다.','특히 {구체적인 사건}[이] 인상 깊었다.','왜냐하면 {이유} 때문이다.','앞으로 {다짐·계획}하고 싶다.']],
+ ['친구와 있었던 일',['오늘 나는 친구 {이름}[와] 함께 시간을 보냈다.','우리는 {장소}에서 {놀이}[을] 했다.','가장 재미있었던 순간은 {재미있던 순간}할 때였다.','친구가 “{친구가 한 말}”라고 말해서 기분이 좋았다.','다음에는 친구와 함께 {하고 싶은 것}[을] 하고 싶다.']],
+ ['칭찬받은 일',['오늘 나는 {칭찬받은 일}[을] 잘해서 칭찬을 받았다.','{선생님·부모님·친구}께서 나를 칭찬해 주셨다.','“{칭찬의 말}”라는 칭찬의 말을 들었다.','칭찬을 받기 위해 나는 {노력한 것}[을] 열심히 했다.','칭찬을 받으니 {기분}한 기분이 들었고, 앞으로도 더 잘하고 싶다.']],
+ ['문제를 해결한 일',['오늘 {문제 상황}[이] 생겼다.','나는 먼저 {첫 번째 시도}[을] 해 봤다.','그런데 {어려움}[이] 있어서 {다른 방법}[으로] 바꿨다.','결국 {해결 방법}[으로] 해결했다.','이런 일이 생기면 {교훈}해야겠다.']],
+ ['새로 배운 것',['오늘 {과목} 시간에 {주제}에 대해 배웠다.','처음에는 {어려웠던 점}[이] 어려웠다.','하지만 {방법}[을] 해 보니 {결과}할 수 있었다.','특히 {흥미로운 점}[이] 재미있었다.','다음에는 {계획}[을] 더 알아보고 싶다.']],
+ ['견학이나 체험',['오늘 우리는 {장소}[으로] 견학(체험)을 갔다.','그곳에서 나는 {본 것}[을] 보고 놀랐다.','가장 기억에 남는 것은 {기억에 남는 것}[이다].','{직접 해 본 것}[을] 직접 해 보니 {느낌}했다.','이번 체험을 통해 {알게 된 것}에 대해 더 알게 되었다.']]
+];
+function parseT(t){const out=[];const re=/\{([^}]+)\}|\[([^\]]+)\]/g;let i=0,m;while((m=re.exec(t))){if(m.index>i)out.push({x:t.slice(i,m.index)});out.push(m[1]?{b:m[1]}:{p:m[2]});i=re.lastIndex}if(i<t.length)out.push({x:t.slice(i)});return out}
+
+const SIX=[
+ ['who','누가','누구랑 있었나요?',['나 혼자','가족이랑','엄마랑','아빠랑','친구랑','선생님이랑','동생이랑'],'예: 지민이랑'],
+ ['when','언제','언제였나요?',['아침에','학교 쉬는 시간에','점심시간에','학교 끝나고','학원 끝나고','저녁에','자기 전에'],'예: 3교시 체육 시간에'],
+ ['where','어디서','어디에 있었나요?',['집에서','학교에서','놀이터에서','마트에서','학원에서','도서관에서','공원에서'],'예: 할머니 댁에서'],
+ ['what','무엇을','무엇을 했나요?',[],'예: 술래잡기를 했다 / 그림을 그렸다'],
+ ['how','어떻게','어떻게 했나요?',['신나게','조심조심','느릿느릿','웃으면서','울면서','열심히','땀을 뻘뻘 흘리며'],'예: 숨을 꾹 참고'],
+ ['why','왜','왜 그렇게 했나요?',[],'예: 재미있어서 / 친구가 하자고 해서']];
+const SIXP=SIX.filter(s=>['who','when','where','what'].includes(s[0]));
+const IMAG=[['im1','무엇을 보고 상상했어?','예: 학교 가는 길에 본 고양이'],['im2','만약에 무슨 일이 생긴다면?','예: 고양이가 갑자기 말을 한다면'],['im3','그게 정말 일어나면 제일 먼저 뭘 할 거야?','예: 고양이한테 이름을 물어볼 거다'],['im4','그다음엔 무슨 일이 생길까?','예: 고양이가 비밀 길을 알려 준다'],['im5','무슨 소리가 나고, 어떻게 끝날까?','예: “야옹, 내일 또 만나!” 하고 사라졌다']];
+const LET=[['to','누구에게 쓸까요?',['엄마께','아빠께','선생님께','할머니께','할아버지께','친구에게','동생에게','나에게'],'예: 단짝 하윤이에게'],['l1','오늘 있었던 일을 들려줘요',[],'예: 오늘 받아쓰기에서 100점을 받았어요'],['l2','그때 내 마음은 어땠나요?',[],'예: 엄마가 생각나서 빨리 말하고 싶었어요'],['l3','꼭 하고 싶은 말',['고마워요','미안해요','사랑해요','부탁이 있어요','보고 싶어요'],'예: 맛있는 저녁 고마워요'],['l4','끝인사',['그럼 안녕히 계세요.','다음에 또 쓸게요.','항상 건강하세요.','내일 또 놀자!'],'']];
+const FREE=[['f1','처음: 무슨 일이 있었나요?','예: 오늘 처음으로 두발자전거를 탔다.'],['f2','가운데: 그 일을 자세히 써요 (본 것, 들은 것, 한 말)','예: 아빠가 뒤에서 잡아 주다가 몰래 손을 놓았다. 나는 그것도 모르고 쭉 달렸다.'],['f3','끝: 생각한 것이나 다짐을 써요','예: 다음에는 혼자서 공원 한 바퀴를 돌고 싶다.']];
+
+const BQG=['기본 이해','감정 공감','상상하기','생각 나누기','마무리'];
+const BQ=["이 책의 제목은 왜 이렇게 지었을까?","주인공은 어떤 인물이었는지 한마디로 표현해 본다면?","이 책에서 기억에 남는 장면은 어디야? 왜?","주인공이 처음과 마지막에 어떻게 달라졌어?","이 책의 주제나 메시지는 뭐라고 생각해?","가장 좋아했던 등장인물은 누구야? 이유는?","가장 이해되지 않았던 행동은 뭐야?","만약 제목을 바꾼다면 뭐라고 하고 싶어?","작가가 전하려고 한 마음은 무엇일까?","책을 읽으며 떠오른 속담이나 격언이 있을까?","이 이야기의 배경은 어디야? 그곳에 가 보고 싶어?","등장인물 중 누구의 친구가 되고 싶어? 왜?","주인공이 가장 힘들었던 순간은 언제였을까?","이 이야기에서 가장 중요한 물건은 뭐였어?","책 속 일을 일어난 차례대로 세 가지만 말해 볼래?","한 문장으로 이 책을 소개해 본다면?","마지막 장면을 바꿔 본다면 어떻게 하고 싶어?","처음에 생각했던 이야기와 다 읽은 이야기가 같았어?","이 책을 감정 한 단어로 표현해 본다면?","주인공의 고민, 너라면 어떻게 해결할까?",
+ "주인공의 입장이 되어 한 줄 편지를 써 본다면?","이 장면에서 너였다면 어떤 기분이 들었을까?","주인공에게 조언해 줄 수 있다면 뭐라고 할래?","너라면 같은 상황에서 어떤 선택을 했을까?","등장인물에게 ‘오늘의 감정상’을 준다면 누구에게 어떤 상을 줄래?","주인공이 나랑 비슷하다고 느낀 점은?","주인공이 친구였다면 어떤 말을 해 주고 싶어?","나쁜 행동을 한 인물이 사과문을 쓴다면?","책 속 친구가 우리 반에 전학 온다면?","등장인물을 인터뷰한다면 어떤 질문을 할까?","책 속 사건 중 가장 무서웠던 건 뭐야?","책에서 가장 속상했던 장면은?","어떤 장면에서 기분이 좋아졌어? 왜?","등장인물에게 선물 하나 줄 수 있다면?","주인공에게 가장 필요했던 건 뭐였을까?","이 책 속 감정을 색깔로 표현해 본다면?",
+ "이 책에 뒷이야기가 나온다면 어떤 이야기가 될까?","이 책이 영화로 나온다면 어떤 장면을 제일 멋지게 만들고 싶어?","내가 책 속에 들어간다면 누구의 친구가 되고 싶어?","책 내용으로 광고 포스터를 만든다면 뭐라고 쓸까?","주인공이 마법을 하나 쓸 수 있다면 어떤 걸 쓸까?","등장인물이 타임머신을 탄다면 어디로 갈까?","주인공의 일기를 하루만 써 본다면?","이 책의 세계가 진짜로 생긴다면?","등장인물의 반려동물이 있다면 어떤 모습일까?","책 속 인물들이 오늘 우리 학교에 온다면?","나와 친구가 함께 나오는 짧은 뒷이야기를 써 본다면?","책 제목으로 삼행시를 지어 볼까?",
+ "이 책을 읽으며 생각이 달라진 부분이 있어?","등장인물의 선택이 옳았다고 생각해? 왜?","이 책을 누구에게 가장 먼저 추천하고 싶어?","이야기 속 일이 나에게도 일어날 수 있을까?","친구가 이 책을 싫어했다면 뭐라고 해 줄래?","가장 인상 깊었던 문장은? 이유는?","읽기 전과 읽은 후, 마음에 변화가 있었어?","결말이 마음에 들지 않는다면 어떻게 끝내고 싶어?","이 책에서 가장 마음이 따뜻해졌던 장면은?","이 책을 읽고 실천하고 싶은 행동이 있어?","이 책을 통해 새로 알게 된 것이 있어?","이 책이 없었다면 몰랐을 감정은?",
+ "이 책을 한 단어로 표현하면?","책을 덮고 나서 어떤 기분이 들었어?","부모님이나 선생님과 같이 읽고 싶은 책이야?","다음 책은 이 책처럼 어떤 느낌이면 좋겠어?","이 책을 읽고 지금 하고 싶은 말은?","작가에게 궁금한 점 한 가지는?","한 줄 감상평을 쓴다면?","책 속 주인공이 나를 본다면 뭐라고 할까?","다시 한번 읽고 싶은 부분은?","책을 읽고 떠오른 친구가 있다면 누구?","내가 쓴다면 이 책의 다음 편 제목은?","친구에게 이 책을 한마디로 소개해 줘!"];
+const BQI=[[0,20],[20,36],[36,48],[48,60],[60,BQ.length]];
+
+const FEEL=[
+ {k:'joy',t:'기쁨',w:[['기뻤다','glad','기뻤|기뻐|기쁘|기쁜'],['신났다','excited','신났|신나|신난'],['행복했다','happy','행복'],['뿌듯했다','proud','뿌듯'],['설렜다','thrilled','설레|설렜|설렌'],['즐거웠다','cheerful','즐거|즐겁'],['재미있었다','amused','재미있|재밌'],['고마웠다','thankful','고마|고맙|감사'],['편안했다','comfortable','편안|편했'],['만족스러웠다','satisfied','만족'],['감동했다','delighted','감동'],['자랑스러웠다','proud','자랑스']],
+  body:['어깨가 들썩들썩했다','입이 귀에 걸렸다','콧노래가 절로 나왔다','가슴이 두근두근했다','하늘을 날 것 같았다']},
+ {k:'sad',t:'슬픔',w:[['슬펐다','sad','슬펐|슬퍼|슬프|슬픈'],['속상했다','upset','속상'],['서운했다','hurt','서운'],['아쉬웠다','disappointed','아쉬'],['외로웠다','lonely','외로'],['실망했다','disappointed','실망'],['미안했다','sorry','미안'],['허전했다','empty','허전'],['후회됐다','regretful','후회'],['울적했다','gloomy','울적']],
+  body:['눈물이 핑 돌았다','어깨가 축 처졌다','마음이 쿡쿡 쑤셨다','목이 메었다','한숨이 푹 나왔다']},
+ {k:'angry',t:'화남',w:[['화났다','angry','화났|화가|화나'],['짜증 났다','annoyed','짜증'],['답답했다','frustrated','답답'],['억울했다','resentful','억울'],['샘났다','jealous','샘났|샘이|질투'],['부러웠다','envious','부러웠|부러워|부럽'],['심술 났다','grumpy','심술'],['기분이 상했다','offended','기분이 상'],['불공평했다','unfair','불공평'],['툴툴거렸다','crabby','툴툴']],
+  body:['얼굴이 빨개졌다','주먹이 꽉 쥐어졌다','머리에서 김이 나는 것 같았다','콧김이 씩씩 나왔다','입이 삐죽 나왔다']},
+ {k:'worry',t:'걱정·놀람',w:[['걱정됐다','worried','걱정'],['무서웠다','scared','무서'],['긴장됐다','nervous','긴장'],['떨렸다','tense','떨렸|떨려|떨리'],['부끄러웠다','shy','부끄'],['당황했다','embarrassed','당황'],['놀랐다','surprised','놀랐|놀라|놀란'],['어색했다','awkward','어색'],['겁났다','afraid','겁이|겁났|겁나'],['조마조마했다','anxious','조마조마']],
+  body:['심장이 쿵쾅쿵쾅 뛰었다','손에 땀이 났다','얼굴이 화끈거렸다','다리가 후들후들 떨렸다','눈이 휘둥그레졌다']},
+ {k:'etc',t:'그 밖의 기분',w:[['피곤했다','tired','피곤'],['지루했다','bored','지루'],['졸렸다','sleepy','졸렸|졸려|졸린'],['궁금했다','curious','궁금'],['신기했다','fascinated','신기'],['홀가분했다','carefree','홀가분'],['자신 있었다','confident','자신 있|자신감'],['용기가 났다','brave','용기'],['안심됐다','relieved','안심|다행'],['차분했다','calm','차분']],
+  body:['눈꺼풀이 무거웠다','하품이 쩍쩍 나왔다','고개가 갸우뚱했다','마음이 날아갈 듯 가벼웠다','숨을 후 내쉬었다']}];
+const ALLFEEL=FEEL.flatMap(g=>g.w);
+
+const DESC=[
+ {t:'모양 흉내말',h:'움직이는 모습을 흉내 내요',w:['반짝반짝','데굴데굴','살금살금','깡충깡충','꾸벅꾸벅','방긋방긋','성큼성큼','뒤뚱뒤뚱','폴짝폴짝','엉금엉금','두리번두리번','꼬물꼬물']},
+ {t:'소리 흉내말',h:'들리는 소리를 흉내 내요',w:['쿵쾅쿵쾅','와르르','첨벙첨벙','째깍째깍','보글보글','사각사각','깔깔깔','쨍그랑','똑똑','바스락','후루룩','꼬르륵']},
+ {t:'맛',w:['달콤했다','새콤했다','짭짤했다','매콤했다','고소했다','쫄깃했다','시원했다','바삭바삭했다']},
+ {t:'만졌을 때',w:['말랑말랑했다','보들보들했다','까끌까끌했다','미끌미끌했다','따끈따끈했다','차가웠다','끈적끈적했다','폭신폭신했다']},
+ {t:'봤을 때',w:['알록달록했다','커다랬다','조그마했다','동그랬다','길쭉했다','반짝였다','뾰족했다','투명했다']},
+ {t:'날씨·냄새',w:['화창했다','쌀쌀했다','후덥지근했다','선선했다','향긋했다','구수했다','고소한 냄새가 났다','퀴퀴했다']},
+ {t:'얼마나·어떻게',h:'움직임이나 기분 앞에 붙여요',w:['무척','너무너무','살짝','갑자기','드디어','겨우','천천히','조용히','깜짝','엄청','한참 동안','처음으로']}];
+const dkey=w=>w.replace(/(한 냄새가 났다|했다|였다|웠다|랬다|났다|다)$/,'');
+
+const CONN=[
+ {t:'차례대로',w:[['먼저','먼저 '],['그다음에','그다음에 '],['그러고 나서','그러고 나서 '],['그러다가','그러다가 '],['잠시 후','잠시 후 '],['마지막으로','마지막으로 '],['드디어','드디어 ']]},
+ {t:'덧붙이기',w:[['그리고','그리고 '],['게다가','게다가 '],['또한','또한 ']]},
+ {t:'까닭·결과',w:[['왜냐하면 ~ 때문이다','왜냐하면 | 때문이다.'],['그래서','그래서 '],['그 덕분에','그 덕분에 '],['그러니까','그러니까 ']]},
+ {t:'반대로',w:[['그런데','그런데 '],['하지만','하지만 '],['그래도','그래도 '],['그러나','그러나 ']]},
+ {t:'정리하기',w:[['결국','결국 '],['이처럼','이처럼 '],['오늘 하루는','오늘 하루는 | 하루였다.']]}];
+const CONNK=['먼저','그다음','그러고 나서','그러다가','잠시 후','마지막으로','드디어','그리고','게다가','또한','왜냐하면','그래서','덕분에','그러니까','그런데','하지만','그래도','그러나','결국','이처럼'];
+
+const OPEN=[['대화로 시작','“야, 빨리 와!” 친구가 나를 불렀다.'],['소리로 시작','쿵! 갑자기 큰 소리가 났다.'],['질문으로 시작','오늘 나에게 무슨 일이 있었을까?'],['날씨로 시작','햇볕이 쨍쨍 내리쬐는 날이었다.'],['기분으로 시작','오늘은 하루 종일 콧노래가 나왔다.']];
+const CLOSE=[['다짐','다음에는 꼭 |해야겠다.'],['바람','내일도 오늘처럼 |면 좋겠다.'],['알게 된 점','오늘 |을/를 알게 되었다.'],['느낀 점','오늘 하루는 정말 | 하루였다.'],['질문','친구는 그때 어떤 기분이었을까?']];
+
+const PROV=[["가는 날이 장날이다", "뜻하지 않은 일이 우연하게도 잘 들어 맞았을 때 쓰는 말."], ["가는 말이 고와야 오는 말이 곱다", "내가 남에게 좋게 해야 남도 내게 잘 한다는 말."], ["가랑비에 옷 젖는 줄 모른다", "재산 같은 것이 조금씩 조금씩 없어지는 줄 모르게 줄어 들어가는 것을 뜻함."], ["가랑잎이 솔잎더러 바스락거린다고 한다", "제 결점이 큰 줄 모르고 남의 작은 허물을 탓한다는 말."], ["가재는 게 편이라", "됨됨이나 형편이 비슷하고 인연 있는 것끼리 서로 편이 되어 어울리고 사정을 보아 줌을 이르는 말."], ["가지 많은 나무에 바람 잘 날 없다", "자식 많은 사람은 걱정이 떠날 때가 없다는 뜻."], ["간에 가 붙고 쓸개에 가 붙는다", "제게 조금이라도 이로운 일이라면 체면과 뜻을 어기고 아무에게나 아첨한다는 뜻."], ["간에 기별도 안 간다", "음식을 조금밖에 먹지 못하여 제 양에 차지 않을 때 쓰는 말."], ["간이 콩알만해지다", "겁이 나서 몹시 두려워진다는 뜻."], ["갈수록 태산", "어려운 일을 당하면 당할 수록 점점 어려운 일이 닥쳐 온다는 뜻."], ["값싼 것이 비지떡", "무슨 물건이고 값이 싸면 품질이 좋지 못하다는 뜻."], ["같은 값이면 다홍치마", "이왕 같은 값이면 자기에게 소득이 많은 것으로 택한다는 말."], ["개구리 올챙이 적 생각을 못한다", "자기의 지위가 높아지면 전날의 미천하던 때의 생각을 못한다는 뜻."], ["개밥에 도토리", "여럿속에 어울리지 못하는 사람을 뜻하는 말."], ["개천에서 용 난다", "변변하지 못한 집안에서 훌륭한 인물이 나왔을 때 쓰는 말."], ["고기는 씹어야 맛이요, 말은 해야 맛이라", "마음 속으로만 끙끙거리고 애타하지 말고 할 말은 속 시원히 해야 한다는 말."], ["고래 싸움에 새우 등 터진다", "힘센 사람들끼리 서로 싸우는 통에 공연히 약한 사람이 그 사이에 끼여 아무 관계없이 해를 입을 때 쓰는 말."], ["고양이 목에 방울 달기", "실행하기 어려운 일을 공연히 의논함을 빗대어 이르는 말."], ["공든 탑이 무너지랴", "힘을 다하고 정성을 다하여 한 일은 헛되지 않아 반드시 좋은 결과를 얻는다는 뜻."], ["구더기 무서워 장 못 담글까", "다소 방해되는 일이 있다 하더라도 마땅히 할 일은 해야 한다는 말."], ["구슬이 서 말이라도 꿰어야 보배라", "아무리 훌륭한 일이라도 완전히 끝을 맺어 놓아야 비로소 가치가 있다는 말."], ["귀에 걸면 귀걸이, 코에 걸면 코걸이", "한 가지의 것이 이런 것도 같고 저런 것도 같아 어느 한 쪽으로 결정짓기 어려운 일을 두고 하는 말."], ["그림의 떡", "보기는 하여도 먹을 수도 없고 가질 수도 없어 실제에 아무 소용이 없는 경우를 이르는 말."], ["금강산도 식후경", "아무리 좋은 것, 재미있는 일이 있더라도 배가 부르고 난 뒤에야 좋은 줄 안다. 곧, 먹지 않고는 좋은 줄 모른다는 뜻."], ["뛰는 놈 위에 나는 놈 있다", "아무리 재주가 있다 하여도 그보다 나은 사람이 있는 것이니 너무 자랑하지 말라는 뜻."], ["까마귀 날자 배 떨어진다", "아무 관계없이 한 일이 공교롭게도 다른 일과 때를 같이 하여 둘 사이에 무슨 관계라도 있는 듯한 의심을 받을 때 쓰는 말."], ["꿩 대신 닭", "자기가 쓰려는 것이 없을 때, 그와 비슷한 것으로 대신 쓸 수도 있다는 말."], ["꿩 먹고 알 먹기", "한가지 일을 하고 두 가지 이익을 볼 때 쓰는 말."], ["남의 잔치에 감 놓아라 배 놓아라 한다", "쓸데없이 남의 일에 간섭한다는 뜻."], ["낫 놓고 기역자도 모른다", "글자라고는 아무것도 모르는 몹시 무식한 사람을 두고 하는 말."], ["낮말은 새가 듣고 밤말은 쥐가 듣는다", "아무리 비밀히 하는 말도 새어 나가기 쉬우니, 말을 항상 조심해서 하라는 뜻."], ["내 코가 석 자", "내 사정이 급해서 남의 사정까지 돌볼 수가 없다는 말."], ["누워서 침 뱉기", "남을 해치려다 도리어 자기 자신이 해를 입는다는 말."], ["늦게 배운 도둑이 날 새는 줄 모른다", "나이 들어서 시작한 일에 몹시 골몰한 사람을 두고 이름."], ["다 된 죽에 코 풀기", "다 된 일을 망쳐 놓았다는 뜻."], ["달면 삼키고 쓰면 뱉는다", "제게 이로우면 이용하며, 필요하지 않을 때에는 버린다는 뜻."], ["닭 잡아 먹고 오리발 내민다", "나쁜 일을 하고 간사한 꾀로 숨기려 할 때 쓰는 말."], ["도둑이 제 발 저리다", "죄 지은 자가 그것이 폭로될까 두려워 하는 나머지 알지 못하는 가운데 그것을 나타내고야 만다는 뜻."], ["돌다리도 두들겨 보고 건너라", "아무리 잘 아는 일이라도 조심하여 실수 없게 하라는 뜻."], ["되로 주고 말로 받는다", "남을 조금 건드렸다가 도리어 일을 크게 당한다는 뜻."], ["등잔 밑이 어둡다", "제게 가까운 일을 먼 데 일보다 오히려 모른다는 뜻."], ["땅 짚고 헤엄치기", "땅을 짚고 헤엄치듯이 아주 쉽게 할 수 있는 일을 가리켜 하는 말."], ["똥 묻은 개가 겨 묻은 개 나무란다", "자기는 더 큰 흉이 있으면서 도리어 남의 작은 흉을 탓한다는 뜻."], ["마른 하늘에 날벼락", "뜻밖에 입는 재난을 이르는 말."], ["말 한마디에 천 냥 빚도 갚는다", "말을 잘 하면 큰 빚도 갚을 수 있다는 말로, 말의 중요성을 나타낸 말."], ["목구멍이 포도청", "먹고 살기 위해서는 어떤 일이라도 하게 된다는 뜻."], ["못된 송아지 엉덩이에 뿔 난다", "되지 못한 사람이 건방지고 좋지 못한 짓을 한다는 뜻"], ["믿는 도끼에 발등 찍힌다", "믿던 일이 뜻밖에 실패한다는 말."], ["밑 빠진 독에 물 붓기", "아무리 노력을 하고 애써도 보람이 나타나지 않는 경우에 쓰는 말."], ["바늘 도둑이 소 도둑 된다", "나쁜 행실일수록 점점 더 크고 심하게 되니 아예 나쁜 버릇은 길들이지 말라는 뜻."], ["배보다 배꼽이 더 크다", "마땅히 작아야 할 것이 오히려 클 때를 비유해서 이르는 말."], ["백지장도 맞들면 낫다", "아무리 쉬운 일이라도 혼자 하는 것보다 협력하여 하는 것이 훨씬 더 낫다는 말."], ["벼룩의 간 빼먹기", "극히 적은 이익을 부당한 수단을 써서 착취한다는 말."], ["병 주고 약 준다", "일이 안 되도록 방해하고는 도와 주는 척한다는 뜻."], ["보기 좋은 떡이 먹기도 좋다", "겉모양이 좋으면 속의 내용도 좋다는 뜻."], ["빛 좋은 개살구", "겉만 번지르하고 실속이 없다는 뜻."], ["사공이 많으면 배가 산으로 올라간다", "간섭하는 사람이 많으면 일이 잘 안 된다는 뜻."], ["새발의 피", "지극히 적은 분량을 말함."], ["서당 개 삼 년에 풍월을 읊는다", "무식한 사람이라도 유식한 사람과 같이 오래 지내면 자연히 견문이 생긴다는 말."], ["세 살 버릇 여든까지 간다", "어려서부터 좋은 버릇을 들여야 한다는 뜻."], ["소문난 잔치에 먹을 것 없다", "소문난 것이 흔히 실지로는 보잘것없다는 말."], ["소 잃고 외양간 고친다", "이미 일을 그르치고 난 뒤 뉘우쳐도 소용이 없다는 뜻."], ["쇠뿔도 단김에 빼랬다", "어떤 일을 하려고 생각하였으면 망설이지 말고 곧 행동으로 옮기라는 뜻."], ["수박 겉 핥기", "내용이나 참 뜻은 모르면서 대충 일하는 것을 비유해서 쓰는 말."], ["식은 죽 먹기", "어떤 일이 아주 하기 쉽다는 말."], ["십 년이면 강산도 변한다", "십 년이란 세월이 흐르면 세상에 변하지 않는 것이 없다는 말."], ["아는 길도 물어 가라", "아무리 익숙한 일이라도 남에게 물어보고 조심함이 안전하다는 뜻."], ["아니 땐 굴뚝에 연기 나랴", "반드시 원인이 있어야 결과가 생긴다는 뜻."], ["아닌 밤중에 홍두깨", "예고도 없이 뜻밖의 일이 생겼을 때 하는 말."], ["약방에 감초", "어떤 일에나 빠짐없이 참여하는 사람을 말함."], ["어물전 망신은 꼴뚜기가 시킨다", "못난 자일수록 그와 같이 있는 동료를 망신시킨다는 말."], ["열 길 물 속은 알아도 한 길 사람 속은 모른다", "사람의 마음은 알아내기가 어렵다는 뜻."], ["열 번 찍어 아니 넘어가는 나무 없다", "여러 번 계속해서 애쓰면 어떤 일이라도 이룰 수 있다는 뜻."], ["오뉴월 감기는 개도 아니 앓는다", "여름철에 감기 걸린 사람을 조롱하는 말."], ["오르지 못할 나무는 쳐다보지도 말아라", "될 수 없는 일은 바라지도 말라는 뜻."], ["옥의 티", "아무리 좋아도 한 가지 결점은 있다는 말."], ["우물에 가서 숭늉 찾는다", "일의 순서도 모르고 성급하게 덤빈다는 뜻."], ["울며 겨자 먹기", "싫은 일을 좋은 척하고 억지로 하지 않을 수 없는 경우를 나타내는 말."], ["원수는 외나무 다리에서 만난다", "남에게 악한 일을 하면 그 죄를 받을 때가 반드시 온다는 뜻."], ["원숭이도 나무에서 떨어진다", "아무리 능숙한 사람도 실수할 때가 있다는 말."], ["윗물이 맑아야 아랫물도 맑다", "윗사람이 잘못하면 아랫사람도 따라서 잘못하게 된다 는 뜻."], ["자라 보고 놀란 가슴 솥뚜껑 보고 놀란다", "무엇에 한 번 혼난 사람이 그와 비슷한 것만 보아도 깜짝 놀란다는 말."], ["자랄 나무는 떡잎부터 알아본다", "앞으로 크게 될 사람은 어려서부터 장래성이 엿보인 다는 말."], ["작은 고추가 더 맵다", "겉으로는 대수롭지 않게 보이는 사람이 하는 일이 더 다부지다는 뜻."], ["종로에서 뺨 맞고 한강 가서 눈 흘긴다", "욕을 당한 자리에서는 아무 말도 못하고 딴 데 가서 화풀이를 한다는 뜻."], ["좋은 약은 입에 쓰다", "듣기 싫고 귀에 거슬리는 말이라도 제 인격 수양에는 이롭다는 뜻."], ["쥐구멍에도 볕 들 날이 있다", "아무리 고생만 하는 사람도 운수가 터져 좋은 시기를 만날 때가 있다는 말."], ["지렁이도 밟으면 꿈틀한다", "아무리 보잘것없는 사람이라도 너무나 업신여기면 성을 낸다는 뜻."], ["천 리 길도 한 걸음부터", "무슨 일이든 그 시초가 중요하다는 뜻."], ["칼로 물 베기", "다투다가도 좀 시간이 흐르면 이내 풀려 두 사람 사이에 아무 틈이 생기지 않는다는 뜻."], ["콩 심은 데 콩 나고 팥 심은 데 팥 난다", "모든 일은 원인에 따라 결과가 생긴다는 말."], ["티끌 모아 태산", "작은 것이라도 모이면 큰 것이 된다는 뜻."], ["핑계 없는 무덤 없다", "무엇을 잘못해 놓고도 여러 가지 이유로 책임을 회피하려는 사람을 두고 하는 말."], ["하늘의 별 따기", "지극히 어려운 일을 두고 하는 말."], ["하늘이 무너져도 솟아날 구멍이 있다", "아무리 큰 재난에 부딪히더라도 그것에서 벗어날 길은 있다는 뜻."], ["하룻강아지 범 무서운 줄 모른다", "아직 철이 없어서 아무 것도 모르는 것을 두고 하는 말."], ["한 귀로 듣고 한 귀로 흘린다", "남이 애써 일러 주는 말을 유념해서 듣지 않고 건성으로 듣는 것을 이름."], ["한 술 밥에 배 부르랴", "무슨 일이고 처음에는 큰 성과를 기대할 수 없다는 말. 힘을 조금 들이고는 큰 효과를 바랄 수 없다는 이야기."], ["함흥차사라", "어떤 일로 심부름 간 사람이 한 번 떠난 뒤로 돌아오지 않거나 아무 소식이 없다는 뜻."], ["호랑이도 제 말 하면 온다", "마침 이야기하고 있는데 그 장본인이 나타났을 때 하는 말로, 그 자리에 사람이 없다고 하여 남의 흉을 함부로 보지 말라는 뜻."]];
+const PTAG={'말과 친구':[2,16,22,31,45,72,90,97,100],'노력·끝까지':[19,20,21,49,63,73,89,92,98],'실수했을 때':[33,35,37,38,48,62,80,93],'쉬운 일':[28,42,65],'어려운 일':[10,18,75,94],'조심하기':[39,67,41],'먹을 것':[8,12,23,24,58],'함께하기':[17,52,57],'습관·배움':[50,59,60,64,83],'뜻밖의 일':[1,26,44,69],'힘이 나는 말':[84,87,88,95,73]};
+
+const IDI=[
+ ['일석이조','一石二鳥','돌 하나로 새 두 마리를 잡는다는 뜻으로, 한 가지 일로 두 가지 좋은 것을 얻음.','심부름을 갔다가 용돈도 받고 칭찬도 들었으니 오늘은 일석이조였다.','공부·생활','돌멩이 하나를 던져 새 두 마리를 한꺼번에 잡았다는 이야기에서 나온 말이에요.'],
+ ['작심삼일','作心三日','굳게 먹은 마음이 사흘을 가지 못함.','매일 줄넘기를 하기로 했는데 작심삼일이 되지 않게 내일도 꼭 해야겠다.','다짐'],
+ ['동문서답','東問西答','동쪽을 물었는데 서쪽을 대답한다는 뜻으로, 물음과 상관없는 엉뚱한 대답.','동생에게 숙제했냐고 물었더니 “배고파!” 하고 동문서답을 했다.','친구·가족'],
+ ['우왕좌왕','右往左往','이리저리 왔다 갔다 하며 어찌할 줄 모름.','소방 훈련 때 처음에는 우왕좌왕했지만 선생님을 따라 잘 나갔다.','학교'],
+ ['자화자찬','自畫自讚','자기가 그린 그림을 스스로 칭찬한다는 뜻으로, 자기 일을 스스로 자랑함.','내가 만든 샌드위치가 세상에서 제일 맛있다고 자화자찬을 했다.','기분'],
+ ['고진감래','苦盡甘來','쓴 것이 다하면 단 것이 온다는 뜻으로, 고생 끝에 즐거움이 옴.','줄넘기 연습을 매일 했더니 이단 뛰기에 성공했다. 고진감래라는 말이 딱 맞다.','노력'],
+ ['유비무환','有備無患','미리 준비해 두면 걱정할 것이 없음.','어젯밤에 가방을 미리 싸 둔 덕분에 아침에 여유로웠다. 유비무환이다!','다짐'],
+ ['이심전심','以心傳心','말하지 않아도 마음과 마음으로 뜻이 통함.','내가 떡볶이가 먹고 싶었는데 엄마가 떡볶이를 해 주셨다. 이심전심이었다.','친구·가족'],
+ ['죽마고우','竹馬故友','대나무 말을 타고 놀던 옛 친구라는 뜻으로, 어릴 때부터 같이 자란 친구.','유치원 때부터 친구인 하윤이는 나의 죽마고우다.','친구·가족','옛날 아이들은 대나무 막대기를 말처럼 타고 놀았어요. 그렇게 함께 놀던 친구라는 뜻이에요.'],
+ ['일취월장','日就月將','날마다 달마다 자라고 나아짐.','피아노 실력이 일취월장해서 선생님께 칭찬을 받았다.','노력'],
+ ['금시초문','今時初聞','지금 처음 들음.','내일이 체육대회라니, 나는 금시초문이었다.','학교'],
+ ['다다익선','多多益善','많으면 많을수록 더 좋음.','칭찬 스티커는 다다익선이다!','기분'],
+ ['막상막하','莫上莫下','누가 더 잘하고 못하는지 가리기 어려움.','아빠와 나의 팔씨름은 막상막하였다.','놀이'],
+ ['박장대소','拍掌大笑','손뼉을 치며 크게 웃음.','삼촌의 흉내를 보고 온 가족이 박장대소했다.','기분'],
+ ['반신반의','半信半疑','반은 믿고 반은 의심함.','친구가 교실에 귀신이 나온다고 해서 반신반의했다.','친구·가족'],
+ ['설상가상','雪上加霜','눈 위에 서리가 덮인다는 뜻으로, 어려운 일이 겹쳐 생김.','우산을 안 가져왔는데 설상가상으로 신발 끈까지 풀렸다.','속상한 날'],
+ ['어부지리','漁夫之利','두 사람이 다투는 사이에 엉뚱한 사람이 이익을 봄.','형과 누나가 과자를 두고 다투는 사이, 내가 어부지리로 과자를 먹었다.','친구·가족','조개와 새가 서로 물고 놓지 않고 싸우는 사이에 지나가던 어부가 둘 다 잡아 갔다는 옛이야기에서 나온 말이에요.'],
+ ['역지사지','易地思之','처지를 바꾸어서 생각해 봄.','동생 입장에서 역지사지해 보니 내 장난이 싫었을 것 같다.','친구·가족'],
+ ['오리무중','五里霧中','짙은 안개 속에 있는 것처럼 어떻게 된 일인지 알 수 없음.','잃어버린 지우개가 어디 있는지 오리무중이다.','속상한 날','옛날 중국에 5리(약 2km)나 되는 안개를 일으키는 도술을 부리던 사람이 있었다는 이야기에서 나왔어요.'],
+ ['온고지신','溫故知新','옛것을 익히고 그것으로 새것을 앎.','할머니께 옛날 놀이를 배우니 온고지신이라는 말이 떠올랐다.','공부·생활'],
+ ['유유상종','類類相從','비슷한 것끼리 서로 어울림.','공룡을 좋아하는 친구들끼리 모이니 유유상종이었다.','친구·가족'],
+ ['인과응보','因果應報','한 일에 따라 그에 맞는 결과를 받음.','놀기만 하다가 숙제를 못 해서 혼났다. 인과응보다.','속상한 날'],
+ ['일편단심','一片丹心','변하지 않는 한결같은 참된 마음.','나는 초콜릿 아이스크림만 고르는 일편단심이다.','기분'],
+ ['자업자득','自業自得','자기가 한 일의 결과를 자기가 받음.','밤늦게까지 놀았더니 아침에 너무 졸렸다. 자업자득이다.','속상한 날'],
+ ['전화위복','轉禍爲福','나쁜 일이 오히려 좋은 일이 됨.','비가 와서 소풍이 취소됐지만 집에서 영화를 봐서 전화위복이 되었다.','속상한 날'],
+ ['천고마비','天高馬肥','하늘이 높고 말이 살찐다는 뜻으로, 맑고 풍성한 가을.','천고마비의 계절이라 그런지 밥이 정말 맛있다.','계절'],
+ ['청출어람','靑出於藍','쪽에서 나온 푸른 물감이 쪽보다 더 푸르다는 뜻으로, 제자가 스승보다 나음.','내가 알려 준 종이접기를 동생이 더 잘 접었다. 청출어람이다.','공부·생활','쪽이라는 풀로 파란 물감을 만드는데, 그 물감이 쪽보다 더 파랗다는 데서 나온 말이에요.'],
+ ['칠전팔기','七顚八起','일곱 번 넘어져도 여덟 번 일어남.','자전거를 타다 여러 번 넘어졌지만 칠전팔기로 결국 성공했다.','노력'],
+ ['학수고대','鶴首苦待','학처럼 목을 길게 빼고 몹시 기다림.','주말에 갈 캠핑을 학수고대하고 있다.','기분'],
+ ['형설지공','螢雪之功','반딧불과 눈빛으로 공부해 얻은 보람이라는 뜻으로, 어려움 속에서도 부지런히 공부함.','형설지공처럼 꾸준히 한자 공부를 해서 시험에 붙고 싶다.','공부·생활','기름 살 돈이 없던 옛사람이 여름엔 반딧불, 겨울엔 눈에 비친 달빛으로 책을 읽었다는 이야기에서 나왔어요.'],
+ ['호시탐탐','虎視眈眈','호랑이가 먹이를 노려보듯 기회를 엿봄.','강아지가 내 과자를 호시탐탐 노렸다.','놀이'],
+ ['대동소이','大同小異','크게 보면 같고 조금만 다름.','내 그림과 짝의 그림은 대동소이했다.','학교'],
+ ['동고동락','同苦同樂','괴로움과 즐거움을 함께함.','우리 반은 일 년 동안 동고동락한 가족 같다.','친구·가족'],
+ ['백발백중','百發百中','백 번 쏘아 백 번 맞힘. 하는 일마다 다 들어맞음.','오늘 받아쓰기는 백발백중, 다 맞았다!','학교'],
+ ['기진맥진','氣盡脈盡','기운이 다 빠져 몹시 지침.','운동장을 다섯 바퀴 돌았더니 기진맥진했다.','기분'],
+ ['애지중지','愛之重之','매우 사랑하고 소중히 여김.','나는 생일 선물로 받은 인형을 애지중지한다.','기분'],
+ ['견물생심','見物生心','물건을 보면 갖고 싶은 마음이 생김.','문구점에 들어가니 견물생심으로 다 사고 싶었다.','기분'],
+ ['각양각색','各樣各色','여러 가지 모양과 빛깔.','시장에는 각양각색의 과일이 있었다.','공부·생활'],
+ ['선견지명','先見之明','앞일을 미리 내다보는 지혜.','우산을 챙기라고 하신 엄마는 선견지명이 있으시다.','친구·가족'],
+ ['감지덕지','感之德之','분에 넘치는 것 같아 매우 고맙게 여김.','숙제를 도와준 형에게 감지덕지했다.','친구·가족'],
+ ['십중팔구','十中八九','열 가운데 여덟이나 아홉, 거의 틀림없음.','하늘이 깜깜한 걸 보니 십중팔구 비가 올 것 같다.','공부·생활'],
+ ['대기만성','大器晩成','큰 그릇은 늦게 만들어진다는 뜻으로, 크게 될 사람은 늦게 이루어짐.','나는 아직 줄넘기가 서툴지만 대기만성일 거다!','노력','큰 솥이나 종 같은 큰 그릇은 만드는 데 오래 걸린다는 옛말에서 나왔어요.']];
+const ITAGS=[...new Set(IDI.map(i=>i[4]))];
+
+/* ---------- 캐릭터 (글분석 학습지·이모티콘 학교와 같은 그림체) ---------- */
+const CI='#342A2A',SW='stroke="'+CI+'" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"';
+function eyesC(m,lx,rx,y){
+  if(m==='oops')return `<path d="M${lx-5} ${y-4} l7 4 l-7 4 M${rx+5} ${y-4} l-7 4 l7 4" fill="none" ${SW}/>`;
+  if(m==='cheer')return `<path d="M${lx-5} ${y+2} q5 -8 10 0 M${rx-5} ${y+2} q5 -8 10 0" fill="none" ${SW}/>`;
+  const ry=m==='wow'?8:6.5,rxx=m==='wow'?6:5,dy=m==='think'?-2:0;
+  return [lx,rx].map(x=>`<ellipse cx="${x}" cy="${y+dy}" rx="${rxx}" ry="${ry}" fill="${CI}"/><circle cx="${x+1.8}" cy="${y+dy-2.8}" r="2" fill="#fff"/>`).join('')}
+function mouthC(m,cx,y){
+  if(m==='wow')return `<ellipse cx="${cx}" cy="${y+2}" rx="5" ry="6" fill="#E9707F" ${SW}/>`;
+  if(m==='oops')return `<path d="M${cx-9} ${y+2} q3 -4 6 0 q3 4 6 0 q3 -4 6 0" fill="none" ${SW}/>`;
+  if(m==='think')return `<path d="M${cx-5} ${y+2} h9" fill="none" ${SW}/>`;
+  if(m==='cheer')return `<path d="M${cx-8} ${y-1} q8 13 16 0 z" fill="#E9707F" ${SW}/>`;
+  return `<path d="M${cx-7} ${y} q7 8 14 0" fill="none" ${SW}/>`}
+function extrasC(m){
+  if(m==='wow'||m==='cheer')return `<path d="M106 26 l3 8 l8 3 l-8 3 l-3 8 l-3 -8 l-8 -3 l8 -3z" fill="#FFD66B" ${SW}/><path d="M12 40 l2 5 l5 2 l-5 2 l-2 5 l-2 -5 l-5 -2 l5 -2z" fill="#F5A3B7" stroke="${CI}" stroke-width="2"/>`;
+  if(m==='oops')return `<path d="M102 44 q6 9 0 13 q-6 -4 0 -13z" fill="#9CC8F2" ${SW}/>`;
+  if(m==='think')return `<text x="100" y="34" font-family="Gaegu,sans-serif" font-weight="700" font-size="30" fill="${CI}">?</text>`;
+  return ''}
+function daldal(m='happy'){
+  const arms=m==='cheer'?`<path d="M28 98 q-12 -12 -8 -26" fill="none" ${SW}/><circle cx="20" cy="70" r="6" fill="#FFF3EA" ${SW}/><path d="M92 98 q12 -12 8 -26" fill="none" ${SW}/><circle cx="100" cy="70" r="6" fill="#FFF3EA" ${SW}/>`
+    :`<g transform="rotate(-24 98 92)"><rect x="92" y="70" width="10" height="34" rx="2" fill="#F5A3B7" ${SW}/><path d="M92 104 l5 10 l5 -10z" fill="#FFE3C4" ${SW}/></g>`;
+  return `<svg viewBox="0 0 120 128" aria-hidden="true">${arms}
+    <path d="M34 118 q26 16 52 0 l-6 -18 h-40z" fill="#F5A3B7" ${SW}/>
+    <path d="M52 100 l8 8 l8 -8" fill="#fff" ${SW}/>
+    <circle cx="60" cy="24" r="13" fill="#6B4A3E" ${SW}/>
+    <ellipse cx="60" cy="64" rx="36" ry="36" fill="#6B4A3E" ${SW}/>
+    <circle cx="60" cy="68" r="29" fill="#FFF3EA" ${SW}/>
+    <path d="M30 60 q6 -26 30 -28 q24 2 30 28 q-12 -12 -30 -10 q-6 0 -10 6 q-2 -6 -6 -6 q-8 0 -14 10z" fill="#6B4A3E" ${SW}/>
+    <circle cx="82" cy="30" r="8" fill="#FFB8A6" ${SW}/><path d="M82 22 q4 -6 9 -4 q-3 5 -9 4z" fill="#A6D98A" ${SW}/>
+    <circle cx="48" cy="70" r="9.5" fill="none" ${SW}/><circle cx="72" cy="70" r="9.5" fill="none" ${SW}/><path d="M57.5 70 h5" ${SW}/>
+    ${eyesC(m,48,72,71)}
+    <ellipse cx="38" cy="82" rx="5.5" ry="3.4" fill="#F7A6B8" opacity=".85"/><ellipse cx="82" cy="82" rx="5.5" ry="3.4" fill="#F7A6B8" opacity=".85"/>
+    ${mouthC(m,60,85)}${extrasC(m)}</svg>`}
+function mongi(m='happy'){
+  const wing=m==='cheer'?`<path d="M26 70 q-16 -10 -12 -26 q12 6 16 20z" fill="#FFE07F" ${SW}/><path d="M94 70 q16 -10 12 -26 q-12 6 -16 20z" fill="#FFE07F" ${SW}/>`
+    :`<path d="M28 74 q-12 4 -10 16 q10 -2 14 -10z" fill="#FFE07F" ${SW}/><path d="M92 74 q12 4 10 16 q-10 -2 -14 -10z" fill="#FFE07F" ${SW}/>`;
+  const pencil=m==='think'||m==='happy'?`<g transform="rotate(28 100 86)"><rect x="94" y="62" width="11" height="36" rx="2" fill="#7FB6F0" ${SW}/><path d="M94 98 l5.5 11 l5.5 -11z" fill="#FFE3C4" ${SW}/><rect x="94" y="57" width="11" height="7" rx="2" fill="#F5A3B7" ${SW}/></g>`:'';
+  return `<svg viewBox="0 0 120 124" aria-hidden="true">
+    <path d="M48 112 v6 M44 118 h8 M72 112 v6 M68 118 h8" fill="none" ${SW}/>${wing}
+    <ellipse cx="60" cy="74" rx="36" ry="38" fill="#FFE590" ${SW}/>
+    <path d="M54 37 q-4 -12 4 -16 q2 8 2 15 M62 36 q6 -11 14 -8 q-6 5 -10 10" fill="#FFE590" ${SW}/>
+    ${eyesC(m,47,73,68)}
+    <path d="M54 80 l6 7 l6 -7z" fill="#F6A13D" ${SW}/>
+    <ellipse cx="38" cy="84" rx="6" ry="3.5" fill="#F7A6B8" opacity=".8"/><ellipse cx="82" cy="84" rx="6" ry="3.5" fill="#F7A6B8" opacity=".8"/>
+    ${m==='wow'||m==='oops'||m==='cheer'?mouthC(m,60,92):''}${pencil}${extrasC(m)}</svg>`}
+
+/* ---------- 저장 ---------- */
+const pad=n=>String(n).padStart(2,'0');
+const iso=d=>`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+const pdate=s=>{const [y,m,d]=String(s).split('-').map(Number);return new Date(y,(m||1)-1,d||1)};
+const dlab=s=>{const d=pdate(s);return `${d.getMonth()+1}월 ${d.getDate()}일 ${WD[d.getDay()]}요일`};
+const dlabY=s=>{const d=pdate(s);return `${d.getFullYear()}년 ${dlab(s)}`};
+function fresh(){return{date:iso(new Date()),weather:'',wline:'',tg:-1,ti:-1,own:'',form:'',a:{},feels:[],body:'',title:'',pic:null,tpl:0,bqg:0,bq:0,step:0,manual:false,id:null}}
+function load(){try{const r=localStorage.getItem(LS);if(r){const s=JSON.parse(r);s.entries=s.entries||[];return s}}catch(e){}return null}
+let S=load()||{name:'지호',entries:[],draft:null};
+let warned=false;
+function save(){try{localStorage.setItem(LS,JSON.stringify(S))}catch(e){if(!warned){warned=true;toast('이 기기에 저장이 안 돼요. 다 쓰면 엄마에게 보내 두세요.')}}}
+let view=S.draft&&S.draft.step>0?'home':'home';
+const D=()=>S.draft;
+const kid=()=>(S.name||'지호').trim()||'지호';
+
+/* ---------- 공용 ---------- */
+let toastT;
+function toast(t){const o=$('.toast');if(o)o.remove();const e=document.createElement('div');e.className='toast';e.setAttribute('role','status');e.textContent=t;document.body.appendChild(e);clearTimeout(toastT);toastT=setTimeout(()=>e.remove(),2200)}
+function modal(html,bind){const L=$('#layer');L.innerHTML=`<div class="modal"><div class="mbox" role="dialog" aria-modal="true">${html}</div></div>`;
+  const m=L.firstChild,close=()=>{L.innerHTML='';document.removeEventListener('keydown',k)},k=e=>{if(e.key==='Escape')close()};
+  document.addEventListener('keydown',k);m.addEventListener('click',e=>{if(e.target===m)close()});bind&&bind(m.firstChild,close);return close}
+function confirmIn(title,text,yes,onYes){modal(`<h2 style="font-size:26px">${title}</h2><p class="lead">${text}</p><div class="row" style="justify-content:flex-end"><button class="btn" data-no>아니요</button><button class="btn pri" data-yes>${yes}</button></div>`,(b,close)=>{b.querySelector('[data-no]').onclick=close;b.querySelector('[data-yes]').onclick=()=>{close();onYes()}})}
+
+const topicText=d=>d.own.trim()||(d.tg>=0&&d.ti>=0?TOPICS[d.tg].ideas[d.ti]:'');
+const wName=k=>(WEATHER.find(w=>w[0]===k)||[])[1]||'';
+
+/* ---------- 초안 만들기 ---------- */
+function feelSent(d,lead){const f=d.feels;if(!f.length)return '';const a=f.length>1?`${f[0].replace(/다$/,'고')} ${f[1]}`:f[0];return `${lead||'그때 나는 정말'} ${a}.`+(d.a.body?` ${end(d.a.body)}`:'')}
+function sixSent(a){
+  const parts=[a.when,a.who,a.where,a.how].map(x=>(x||'').trim()).filter(Boolean);
+  let what=(a.what||'').trim();
+  const out=[];
+  if(what||parts.length){out.push(end([...parts,what||'놀았다'].join(' ')))}
+  const why=(a.why||'').trim();
+  if(why){out.push(/때문/.test(why)?`왜냐하면 ${end(why)}`:/(서|니까|려고)$/.test(why)?`${why} 그렇게 했다.`:`왜냐하면 ${why} 때문이다.`)}
+  return out}
+function buildDraft(d){const a=d.a,L=[];
+  switch(d.form){
+   case 'six':case 'pic':L.push(...sixSent(a));L.push(feelSent(d));break;
+   case 'blank':{const T=GUIDE[d.tpl][1];T.forEach((t,i)=>{const parts=parseT(t);let s='',last='',any=false;parts.forEach((p,j)=>{if(p.x)s+=p.x;else if(p.b){const v=(a[`b${d.tpl}_${i}_${j}`]||'').trim();if(v)any=true;last=v;s+=v||'____'}else if(p.p)s+=P(last,p.p)});if(any)L.push(s)});L.push(feelSent(d,'오늘 나는'));break}
+   case 'imagine':{if(a.im1)L.push(`오늘 ${a.im1.trim()}${P(a.im1,'을')} 보고 재미있는 상상을 했다.`);if(a.im2)L.push(`만약 ${end(a.im2.replace(/^만약(에)?\s*/,''))}`.replace(/\.$/,'?'));['im3','im4','im5'].forEach(k=>a[k]&&L.push(end(a[k])));L.push(feelSent(d,'상상만 해도'));break}
+   case 'letter':{const to=(a.to||'엄마께').trim();L.push(`사랑하는 ${to}`);L.push('');if(a.l1)L.push(end(a.l1));if(a.l2)L.push(end(a.l2));if(d.feels.length)L.push(feelSent(d,'그때 저는'));if(a.l3)L.push(end(a.l3));if(a.l4)L.push(end(a.l4));L.push('');L.push(`${dlab(d.date)}  ${kid()}${/께$/.test(to)?' 올림':(jong(kid())?'이가':'가')}`);break}
+   case 'free':['f1','f2','f3'].forEach((k,i)=>{if(a[k]){L.push(end(a[k]));if(i===1&&d.feels.length)L.push(feelSent(d))}});if(!a.f2&&d.feels.length)L.push(feelSent(d));break;
+   case 'book':{const t=(a.bt||'').trim();if(t)L.push(`오늘 『${t}』${P(t,'을')} 읽었다.`);if(a.ba){const bk=a.bg?(['동화','그림책','만화'].includes(a.bg)?a.bg:a.bg+' 책'):'책';L.push(`${a.ba.trim()} 작가님이 쓴 ${bk}${P(bk,'이다')}.`)}if(a.b1)L.push(end(a.b1));if(a.b2)L.push(`가장 기억에 남는 장면은 ${end(a.b2)}`);
+     if(a.b3){L.push(`‘${BQ[d.bq]}’ 하고 생각해 보았다.`);L.push(end(a.b3))}if(a.bs)L.push(`이 책에 별점을 준다면 별 ${a.bs}개를 주고 싶다.`);L.push(feelSent(d,'책을 다 읽고 나니'));break}
+  }
+  return L.filter((x,i)=>x!==undefined&&!(x===''&&L[i-1]==='')).join('\n').replace(/\n{3,}/g,'\n\n').replace(/^\n+/,'').trim()+(d.form==='six'||d.form==='pic'?'':'')}
+
+function titleSugs(d){const a=d.a,f=d.feels[0],fa=f?f.replace(/다$/,'던'):'';
+  let kw=(a.what||'').trim().replace(/\s*(을|를)?\s*(했다|하였다|했어요|했음)[.!]?$/,'').replace(/[.!]$/,'');
+  if(kw.length>12)kw='';
+  const T=[];
+  if(d.form==='book'&&a.bt)T.push(`『${a.bt.trim()}』${P(a.bt,'을')} 읽고`,`${a.bt.trim()} 속으로`);
+  if(d.form==='letter'&&a.to)T.push(`${a.to.trim()} 쓰는 편지`);
+  if(d.form==='imagine'&&a.im2)T.push(a.im2.trim().replace(/[.!?]$/,'').slice(0,16)+'?');
+  if(d.form==='blank'){const g=GUIDE[d.tpl][0];T.push(g==='오늘 있었던 중요한 일'?'오늘의 중요한 일':g)}
+  if(kw){T.push(kw);if(fa)T.push(`${fa} ${kw}`);T.push(`처음 해 본 ${kw}`,`나의 ${kw} 대작전`)}
+  if(fa)T.push(`${fa} 날`);
+  const tp=topicText(d);if(tp&&tp.length<=14)T.push(tp);
+  if(d.wline&&d.wline.length<=16)T.push(d.wline);
+  return [...new Set(T.filter(Boolean))].slice(0,7)}
+
+/* ---------- 점검 ---------- */
+function analyse(d){const b=d.body||'',bt=b.replace(/\s+/g,' ');
+  const feelU=ALLFEEL.filter(w=>new RegExp(w[2]).test(b)).map(w=>w[0]);
+  const seen=new Set(),descU=DESC.flatMap(g=>g.w).filter(w=>{const k=dkey(w);if([...seen].some(f=>f.includes(k))||!b.includes(k))return false;seen.add(k);return true});
+  const connU=CONNK.filter(k=>b.includes(k));
+  const provU=PROV.filter(p=>bt.includes(p[0].slice(0,Math.max(4,p[0].length-2)))).map(p=>p[0]);
+  const idiU=IDI.filter(i=>b.includes(i[0])).map(i=>i[0]);
+  const sents=(b.match(/[^.!?\n]+[.!?]+/g)||[]).filter(s=>s.trim().length>2).length;
+  const chars=b.replace(/\s/g,'').length;
+  const sixU=[d.a.who,d.a.where,d.a.what].filter(Boolean).length;
+  return{feelU,descU,connU,provU,idiU,sents,chars}}
+function checks(d){const r=analyse(d);return[
+  ['날씨를 꾸며 썼어요',!!(d.date&&d.weather&&wxWord(d.wline)),wxWord(d.wline)],
+  ['제목을 지었어요',!!d.title.trim(),''],
+  ['다섯 문장 넘게 썼어요',r.sents>=5,`지금 ${r.sents}문장`],
+  ['내 기분을 썼어요',r.feelU.length>0,r.feelU.slice(0,3).join(', ')],
+  ['꾸며 주는 말·흉내 내는 말을 썼어요',r.descU.length>0,r.descU.slice(0,3).join(', ')],
+  ['이어 주는 말을 썼어요',r.connU.length>0,r.connU.slice(0,3).join(', ')],
+  ['마음 정리 카드를 세 칸 넘게 채웠어요',wuCount(d)>=3,`${wuCount(d)}칸`],
+  ['다시 읽으며 틀린 글자를 고쳤어요',!!d.manual,'스스로 체크해요','manual'],
+  ['보너스: 속담이나 사자성어에 도전!',r.provU.length+r.idiU.length>0,[...r.provU,...r.idiU].slice(0,2).join(', '),'bonus']]}
+function starsOf(d){const c=checks(d),base=c.filter(x=>x[3]!=='bonus'&&x[1]).length;return base>=7?3:base>=5?2:base>=3?1:0}
+const NBASE=8;
+
+/* ---------- 엄마에게 보내기 ---------- */
+function msgOf(d){const r=analyse(d),c=checks(d),s=starsOf(d);
+  const L=[`💌 [${kid()}의 일기 도우미] ${kid()} 일기`,`${dlabY(d.date)} · 날씨: ${wName(d.weather)||'-'}${d.wline?` (${d.wline})`:''}`,''];
+  L.push(`제목: ${d.title||'(아직 없음)'}`);
+  L.push(`주제: ${topicText(d)||'-'} / 양식: ${(FK[d.form]||{}).t||'-'}`);
+  if(d.feels.length)L.push(`오늘 기분: ${d.feels.join(', ')}`);
+  if(d.form==='book'&&d.a.bt)L.push(`읽은 책: 『${d.a.bt}』${d.a.ba?' · '+d.a.ba:''}${d.a.bs?' · 별 '+d.a.bs+'개':''}`);
+  L.push('──────────',(d.body||'(아직 쓰지 않았어요)').trim(),'──────────');
+  const wl=wuLines(d),mm=R(d).memos;if(wl.length||mm.length){L.push('[하루 마무리]');wl.forEach(x=>L.push(`· ${x[0]}: ${x[1]}`));if(mm.length)L.push(`· 내일 꼭 기억할 일: ${mm.map(x=>(x.done?'☑ ':'☐ ')+x.t).join(', ')}`);L.push('')}
+  L.push(`✔ 스스로 점검 ${c.filter(x=>x[1]&&x[3]!=='bonus').length}/${NBASE}  ${'★'.repeat(s)}${'☆'.repeat(3-s)}`);
+  const miss=c.filter(x=>!x[1]&&x[3]!=='bonus').map(x=>x[0]);if(miss.length)L.push(`   다음에 도전: ${miss.join(' / ')}`);
+  const u=[...r.descU.map(x=>x+'(꾸밈말)'),...r.connU.map(x=>x+'(이어 주는 말)'),...r.provU.map(x=>x+'(속담)'),...r.idiU.map(x=>x+'(사자성어)')];
+  if(u.length)L.push(`사용한 표현: ${u.slice(0,10).join(', ')}`);
+  L.push(`글자 수 ${r.chars}자 · ${r.sents}문장`);
+  if(d.pic)L.push('(그림일기 그림은 화면을 캡처해서 함께 보내요)');
+  return L.join('\n')}
+function openSend(d){const text=msgOf(d);
+  modal(`<div class="mtop"><span class="chr">${daldal('cheer')}</span><div class="bubble">엄마한테 일기를 보내자!</div></div>
+   <ol class="send-steps"><li><span class="circ">1</span> <b>복사하기</b>를 눌러요</li><li><span class="circ">2</span> 카톡에서 엄마 대화방을 열어요</li><li><span class="circ">3</span> 길게 눌러 <b>붙여넣기</b> → 보내기!</li></ol>
+   <label class="sr" for="sendTxt">보낼 내용</label><textarea id="sendTxt" readonly rows="10">${esc(text)}</textarea>
+   <p class="status" id="sendMsg" aria-live="polite"></p>
+   <div class="row" style="justify-content:flex-end"><button class="btn" data-x>닫기</button><a class="btn" href="sms:?&body=${encodeURIComponent(text)}" data-sms>문자 앱 열기</a><button class="btn pri" data-copy>복사하기</button></div>`,(b,close)=>{
+    const ta=b.querySelector('#sendTxt'),msg=b.querySelector('#sendMsg');
+    b.querySelector('[data-x]').onclick=close;
+    b.querySelector('[data-sms]').addEventListener('click',()=>{msg.textContent='문자 앱이 안 열리면 복사하기를 눌러 주세요.'});
+    const cp=b.querySelector('[data-copy]');
+    cp.onclick=()=>{const fb=()=>{ta.focus();ta.select();ta.setSelectionRange(0,ta.value.length);msg.textContent='글이 선택됐어요. 길게 누르거나 Ctrl+C로 복사해 주세요.'};
+      try{navigator.clipboard.writeText(text).then(()=>{msg.textContent='복사했어요! 카톡에 붙여 넣어 엄마에게 보내요 💕';cp.textContent='복사 완료 ✔'},fb)}catch(e){fb()}};
+    cp.focus()})}
+
+/* ---------- 첫 화면 ---------- */
+const SAMPLE={date:'2026-10-02',weather:'hot',wline:'너무너무 더워서 땀을 뻘뻘 흘린 날',tg:1,ti:1,own:'',form:'six',a:{who:'친구랑',when:'학교 끝나고',where:'놀이터에서',what:'얼음땡을 했다',how:'땀을 뻘뻘 흘리며',why:'하윤이가 같이 하자고 해서'},feels:['신났다'],title:'땀범벅 얼음땡',
+ body:'학교 끝나고 친구랑 놀이터에서 땀을 뻘뻘 흘리며 얼음땡을 했다. 하윤이가 같이 하자고 해서 그렇게 했다.\n처음에는 내가 술래였다. 친구들이 깡충깡충 도망가서 잡기가 어려웠다. 그런데 하윤이가 미끄럼틀 뒤에 살금살금 숨는 것을 봤다. 나는 성큼성큼 달려가서 “땡!” 하고 잡았다.\n그때 나는 정말 신났다. 어깨가 들썩들썩했다. 다음에는 술래가 되어도 더 빨리 잡고 싶다.',pic:null,manual:true,sample:true,r:{praise:'술래가 되어도 포기하지 않았어',want:'친구들이랑 얼음땡 한 판 더 하고 싶어',line:'“네가 술래 하니까 더 재밌다!”',who:'친구',thanks:'하윤아, 같이 놀자고 해 줘서 고마워',vow:'물 많이 마시기',memos:[{t:'물병 챙기기',done:true},{t:'알림장 보여 드리기',done:false}]}};
+
+function weekDays(){const t=new Date(),m=new Date(t);m.setDate(t.getDate()-((t.getDay()+6)%7));return Array.from({length:7},(_,i)=>{const d=new Date(m);d.setDate(m.getDate()+i);return d})}
+function lastMemoEntry(){const L=S.entries.filter(e=>e.r&&e.r.memos&&e.r.memos.length).sort((a,b)=>b.date.localeCompare(a.date)||(b.savedAt||0)-(a.savedAt||0));return L[0]}
+function memoPanel(){const e=lastMemoEntry();if(!e)return '';const mm=e.r.memos,left=mm.filter(x=>!x.done).length;
+  return `<section class="memo-home"><h3>내일 꼭 기억할 일 <small>${dlab(e.date)} 일기에서 · ${left?left+'개 남았어요':'다 했어요! 👏'}</small></h3>${memoHTML(mm,false)}${e.r.vow?`<p class="lead">내 다짐: <b>${esc(e.r.vow)}</b></p>`:''}</section>`}
+function renderHome(){
+  const today=iso(new Date()),has=new Set(S.entries.map(e=>e.date));
+  const days=weekDays(),cnt=days.filter(d=>has.has(iso(d))).length;
+  const dr=S.draft&&(S.draft.body||S.draft.step>0)?S.draft:null;
+  const list=S.entries.slice().sort((a,b)=>b.date.localeCompare(a.date)||(b.savedAt||0)-(a.savedAt||0));
+  const card=(e,i)=>`<button class="ent" data-ent="${e.sample?'sample':i}">${e.sample?'<span class="ex">예시 일기</span>':starsOf(e)>=3?'<span class="st">참<br>잘함</span>':''}
+     <span class="dt">${wIcon(e.weather)}${dlab(e.date)}</span><b>${esc(e.title||'(제목 없음)')}</b>
+     <span class="snip">${esc((e.body||'').slice(0,90))}</span><span class="tag">${esc((FK[e.form]||{}).t||'')} · ${'★'.repeat(starsOf(e))}${'☆'.repeat(3-starsOf(e))}</span></button>`;
+  $('#app').innerHTML=`
+  <header class="hero">
+    <div><p class="kicker">날짜 → 주제 → 양식 → 재료 → 쓰기 → 점검</p>
+      <h1 class="brand"><span class="esc-name">${esc(kid())}</span>의 <span class="red hl">일기 도우미</span></h1>
+      <p class="sub">무엇을 쓸지 몰라도 괜찮아. <span class="hl-y">질문에 답하면</span> 일기가 <span class="hl-g">저절로 모여요!</span></p></div>
+    <div class="hero-c"><span class="chr bob">${daldal(cnt?'cheer':'happy')}</span><div class="bubble">${cnt?`이번 주에 <b>${cnt}번</b>이나 썼네! 오늘도 한 장 써 볼까?`:`특별한 일이 없어도 괜찮아. 오늘 있었던 <b>작은 순간 하나</b>만 찾으면 돼!`}</div></div>
+  </header>
+  <div class="home-grid">
+    <section class="start"><h3>오늘의 일기</h3>
+      <p>질문에 하나씩 답하고, 감정 낱말·흉내 내는 말·이어 주는 말·속담·사자성어를 골라 넣으면 일기가 완성돼요. 다 쓰면 엄마에게 보내요.</p>
+      <div class="row"><button class="btn pri" id="newBtn">✏ 새 일기 쓰기</button>${dr?`<button class="btn soft" id="contBtn">이어 쓰기 (${STEPN[dr.step]})</button>`:''}</div>
+      <label class="who" for="kidName">일기 주인<input id="kidName" maxlength="6" value="${esc(kid())}"></label>
+    </section>
+    <section class="week"><h3>이번 주 도장판</h3>
+      <div class="days">${days.map(d=>{const k=iso(d);return `<div class="day ${k===today?'today':''}"><span>${WD[d.getDay()]}</span><span class="dot ${has.has(k)?'on':''}" aria-label="${dlab(k)} ${has.has(k)?'씀':'아직'}"></span><small>${d.getDate()}일</small></div>`}).join('')}</div>
+      <p>일기를 일기장에 넣으면 그날 동그라미에 도장이 찍혀요.</p>
+    </section>
+    ${memoPanel()}
+  </div>
+  <section class="shelf"><h3>${esc(kid())}의 일기장 <small>${list.length?list.length+'편':'아직 비어 있어요'}</small></h3>
+    <div class="entries">${list.length?list.map((e,i)=>card(e,S.entries.indexOf(e))).join(''):card(SAMPLE,0)}</div></section>`;
+  $('#newBtn').onclick=()=>{const go=()=>{S.draft=fresh();view='write';save();render();scrollTo({top:0})};if(dr)confirmIn('새 일기를 시작할까요?','쓰던 일기는 지워져요. 먼저 이어 써서 일기장에 넣을 수도 있어요.','새로 쓰기',go);else go()};
+  const c=$('#contBtn');if(c)c.onclick=()=>{view='write';render();scrollTo({top:0})};
+  {const e=lastMemoEntry();if(e)$$('.memo-home [data-mi]').forEach(c=>c.onchange=()=>{e.r.memos[+c.dataset.mi].done=c.checked;save();render();if(e.r.memos.every(x=>x.done))toast('내일 할 일을 모두 챙겼어요! 최고!')})}
+  $('#kidName').onchange=e=>{S.name=e.target.value.trim()||'지호';save();render()};
+  $$('[data-ent]').forEach(b=>b.onclick=()=>openEntry(b.dataset.ent==='sample'?SAMPLE:S.entries[+b.dataset.ent],b.dataset.ent))}
+
+function openEntry(e,idx){
+  modal(`<div class="row"><h2 style="font-size:26px;flex:1">${e.sample?'예시 일기':'일기장'}</h2><button class="btn sm" data-x>닫기</button></div>
+   ${pageHTML(e)}
+   ${e.sample?'<p class="lead">이렇게 쓰면 돼요! 흉내 내는 말(깡충깡충, 살금살금, 성큼성큼)과 이어 주는 말(처음에는, 그런데)을 넣었어요.</p>':''}
+   <div class="row" style="justify-content:flex-end">${e.sample?'':'<button class="btn" data-del>지우기</button><button class="btn" data-edit>고쳐 쓰기</button>'}<button class="btn pri" data-send>엄마에게 보내기</button></div>`,(b,close)=>{
+    fitGrid(b);b.querySelector('[data-x]').onclick=close;b.querySelector('[data-send]').onclick=()=>{close();openSend(e)};
+    const del=b.querySelector('[data-del]');if(del)del.onclick=()=>{close();confirmIn('이 일기를 지울까요?',`「${esc(e.title||'제목 없음')}」을 일기장에서 지워요. 되돌릴 수 없어요.`,'지우기',()=>{S.entries.splice(+idx,1);save();render();toast('지웠어요')})};
+    const ed=b.querySelector('[data-edit]');if(ed)ed.onclick=()=>{close();S.draft=JSON.parse(JSON.stringify(e));S.draft.step=4;S.draft.id=e.id;view='write';save();render();scrollTo({top:0})}})}
+
+/* ---------- 일기장 페이지 (깍두기 공책) ---------- */
+function pageHTML(d){return `<article class="dpage">
+  <div class="dhead"><b>${dlabY(d.date)}</b><span style="display:inline-flex;align-items:center;gap:4px">${wIcon(d.weather)}${esc(wName(d.weather))}</span>${d.wline?`<span class="wl">${esc(d.wline)}</span>`:''}</div>
+  ${d.pic?`<div class="dpic"><img src="${d.pic}" alt="그림일기 그림"></div>`:''}
+  <h3 class="dtitle">${esc(d.title||'제목 없음')}<small>${esc((FK[d.form]||{}).t||'')}${d.feels&&d.feels.length?' · 기분: '+esc(d.feels.join(', ')):''}</small></h3>
+  ${d.form==='book'&&d.a.bt?`<p class="bookline">도서명 『${esc(d.a.bt)}』${d.a.ba?' · 작가 '+esc(d.a.ba):''}${d.a.bs?' · '+'★'.repeat(d.a.bs):''}</p>`:''}
+  <div class="grid-note" data-text="${esc(d.body||'')}"></div>${wuPage(d)}</article>`}
+function wuPage(d){const L=wuLines(d),mm=R(d).memos;if(!L.length&&!mm.length)return '';return `<div class="wu-page"><h4>하루 마무리</h4><dl>${L.map(x=>`<div><dt>${x[0]}</dt><dd>${esc(x[1])}</dd></div>`).join('')}</dl>${mm.length?`<div class="wu-memo"><b>내일 꼭 기억할 일</b><ul>${mm.map(x=>`<li>${x.done?'☑':'☐'} ${esc(x.t)}</li>`).join('')}</ul></div>`:''}</div>`}
+function fitGrid(root){root.querySelectorAll('.grid-note').forEach(g=>{const w=g.clientWidth||320,cols=Math.max(10,Math.min(18,Math.floor(w/30)));g.style.setProperty('--cols',cols);
+  const txt=g.dataset.text||'',cells=[];txt.split('\n').forEach(par=>{if(!par.trim()){for(let i=0;i<cols;i++)cells.push('');return}
+    const ch=[' ',...[...par.trim()]];ch.forEach(c=>cells.push(c===' '?'':c));while(cells.length%cols)cells.push('')});
+  while(cells.length<cols*6)cells.push('');g.innerHTML=cells.map(c=>`<span>${esc(c)}</span>`).join('')})}
+
+/* ---------- 쓰기 단계 ---------- */
+const STEPN=['날짜·날씨','주제','글 양식','재료 모으기','일기 쓰기','마음 정리','다 썼어요'];
+function stepDone(i){const d=D();return[!!(d.date&&d.weather&&wxWord(d.wline)),!!topicText(d),!!d.form,d.feels.length>0,!!(d.body.trim()&&d.title.trim()),wuCount(d)>=3,false][i]}
+function goStep(i){D().step=Math.max(0,Math.min(6,i));save();render();scrollTo({top:0})}
+function navHTML(next,disabled){return `<div class="nav"><button class="btn" data-prev>← ${D().step===0?'처음 화면':'이전'}</button><button class="btn pri" data-next ${disabled?'disabled':''}>${next||'다음 →'}</button></div>`}
+function say(lines,mood,who){$('#bubble').innerHTML=lines.map(l=>`<p>${l}</p>`).join('');$('#tchr').innerHTML=(who==='mongi'?mongi:daldal)(mood||'happy');$('#tnm').innerHTML=who==='mongi'?'<h3>몽이</h3><small>연필 들고 같이 쓰는 친구</small>':'<h3>달달쌤</h3><small>일기 쓰기를 도와주는 엄마 선생님</small>'}
+function renderWrite(){const d=D();
+  $('#app').innerHTML=`<header class="top"><button class="btn sm" id="homeBtn">← 일기장</button><h1>${esc(kid())}의 <span class="red hl">일기 도우미</span></h1><span class="spacer"></span><span class="doodle">${dlab(d.date)}</span></header>
+   <div class="rail-wrap"><nav class="steps" aria-label="일기 쓰기 단계">${STEPN.map((t,i)=>`<button class="stp ${stepDone(i)?'done':''}" ${i===d.step?'aria-current="step"':''} data-step="${i}"><b>${stepDone(i)?'✓':i+1}</b><span>${t}</span></button>`).join('')}</nav></div>
+   <div class="layout"><aside class="teacher"><div class="tface"><span class="chr bob" id="tchr"></span><div class="tname" id="tnm"></div></div><div class="bubble" id="bubble"></div>
+     <div class="momsend"><div><b>엄마에게 보내기</b><span>지금까지 쓴 일기를 엄마한테 보여 줘요</span></div><button class="btn sm" id="momBtn">보내기</button></div></aside>
+   <main id="main"></main></div>`;
+  $('#homeBtn').onclick=()=>{view='home';render();scrollTo({top:0})};
+  $('#momBtn').onclick=()=>openSend(D());
+  $$('[data-step]').forEach(b=>b.onclick=()=>goStep(+b.dataset.step));
+  const m=$('#main');[st0,st1,st2,st3,st4,st5,st6][Math.min(d.step,6)](m);
+  m.querySelector('[data-prev]')?.addEventListener('click',()=>d.step===0?(view='home',render()):goStep(d.step-1));
+  m.querySelector('[data-next]')?.addEventListener('click',()=>goStep(d.step+1))}
+
+/* ① 날짜·날씨 */
+function st0(m){const d=D(),W=WEATHER.find(w=>w[0]===d.weather),hit=wxWord(d.wline),ok=!!(d.weather&&hit);
+  const msgOf=(h,v)=>h?`✔ 꾸며 주는 말 「${h}」${P(h,'이')} 들어 있어요!`:v?'꾸며 주는 말이 아직 없어요. 아래 꾸밈말을 하나 넣어 봐요.':'날씨 문장을 고르거나 직접 써야 다음으로 갈 수 있어요.';
+  say(!d.weather?['안녕, '+esc(kid())+'야! 오늘도 일기 쓰러 왔구나.','먼저 <b>날짜</b>를 확인하고 오늘 <b>날씨</b>를 골라 줘.']
+    :ok?[`<b>${esc(d.wline)}</b>! 날씨가 눈앞에 그려진다.`,`<b>${esc(hit)}</b> 같은 꾸며 주는 말이 들어가서 훨씬 생생해졌어. 이제 주제를 정하자!`]
+    :[`날씨는 <b>${W[1]}</b>!`,'날씨를 그냥 “맑음”이라고 쓰지 말고, <b>꾸며 주는 말을 꼭 하나</b> 넣어서 써 보자. “오들오들”, “뻘뻘”, “둥실둥실”처럼!'],ok?'cheer':d.weather?'think':'happy');
+  m.innerHTML=`<section class="card"><h2><span class="circ">1</span>날짜와 날씨</h2>
+   <div class="datebig"><b>${dlab(d.date)}</b><label class="sr" for="dDate">날짜 바꾸기</label><input type="date" id="dDate" value="${d.date}"></div>
+   <div class="wx" role="group" aria-label="날씨">${WEATHER.map(w=>`<button class="wbtn" data-w="${w[0]}" aria-pressed="${d.weather===w[0]}">${wIcon(w[0])}${w[1]}</button>`).join('')}</div>
+   ${W?`<div class="box"><h4>날씨를 꾸며 써요 <span class="must">꾸밈말 꼭 1개!</span></h4>
+     <p class="lead">노랗게 칠한 말이 <b>꾸며 주는 말</b>이에요. 마음에 드는 문장을 고르거나, 꾸밈말을 넣어 내 문장을 만들어요.</p>
+     <div class="chips">${W[2].map(x=>`<button class="chip wl" data-wl="${esc(wPlain(x))}" aria-pressed="${d.wline===wPlain(x)}"><span>${wMark(x)}</span></button>`).join('')}</div>
+     <label class="field" for="wOwn">내가 만든 날씨 문장</label>
+     <input class="wown ${d.wline&&!hit?'bad':''}" id="wOwn" maxlength="30" value="${esc(W[2].map(wPlain).includes(d.wline)?'':d.wline)}" placeholder="예: 바람이 살랑살랑 불어서 기분 좋은 날">
+     <div class="row"><span class="lead">꾸밈말 넣기</span><div class="chips">${W[3].map(x=>`<button class="chip" data-ww="${esc(x)}">${esc(x)}</button>`).join('')}</div></div>
+     <p class="wxmsg ${ok?'ok':d.wline?'no':''}" id="wxMsg" aria-live="polite">${msgOf(hit,d.wline)}</p></div>`:''}
+   ${navHTML('주제 정하기 →',!ok)}</section>`;
+  m.querySelector('#dDate').onchange=e=>{if(e.target.value){d.date=e.target.value;save();render()}};
+  m.querySelectorAll('[data-w]').forEach(b=>b.onclick=()=>{if(d.weather!==b.dataset.w){d.weather=b.dataset.w;d.wline=''}save();render()});
+  m.querySelectorAll('[data-wl]').forEach(b=>b.onclick=()=>{d.wline=d.wline===b.dataset.wl?'':b.dataset.wl;save();render()});
+  const wo=m.querySelector('#wOwn');if(!wo)return;
+  wo.oninput=()=>{d.wline=wo.value.trim();save();const h=wxWord(d.wline),msg=m.querySelector('#wxMsg');
+    msg.className='wxmsg '+(h?'ok':d.wline?'no':'');msg.textContent=msgOf(h,d.wline);
+    wo.classList.toggle('bad',!!d.wline&&!h);m.querySelector('[data-next]').disabled=!h;m.querySelectorAll('[data-wl]').forEach(b=>b.setAttribute('aria-pressed','false'))};
+  m.querySelectorAll('[data-ww]').forEach(b=>b.onclick=()=>{const w=b.dataset.ww,v=wo.value,st=wo.selectionStart??v.length,pre=v.slice(0,st);
+    wo.value=pre+(pre&&!/\s$/.test(pre)?' ':'')+w+' '+v.slice(st).replace(/^\s+/,'');wo.dispatchEvent(new Event('input'));wo.focus()})}
+
+/* ② 주제 */
+function recForm(d){if(d.tg<0)return 'six';const T=TOPICS[d.tg];return (T.ff&&T.ff[d.ti])||T.form}
+function st1(m){const d=D(),tp=topicText(d),T=d.tg>=0?TOPICS[d.tg]:null;
+  say(tp?[`좋아! 오늘의 주제는 <b>${esc(tp)}</b>.`,'아래 질문에 먼저 <b>말로</b> 대답해 봐. 엄마랑 이야기하면 쓸 말이 쏙쏙 떠올라.']:['오늘 뭘 써 볼까?','특별한 일이 없어도 괜찮아. 여기 있는 것 중에 골라도 되고, 떠오른 다른 이야기를 써도 좋아. 고르기 어려우면 <b>주제 뽑기</b>를 눌러 봐!'],tp?'cheer':'think');
+  m.innerHTML=`<section class="card"><h2><span class="circ">2</span>주제 정하기</h2>
+   <div class="dice"><button class="btn soft" id="dice">🎲 주제 뽑기</button><span class="lead">무엇을 쓸지 모르겠으면 눌러요</span></div>
+   <div class="tgrid">${TOPICS.map((t,gi)=>`<div class="tg ${d.tg===gi&&!d.own?'on':''}"><h3>${t.t}<small>${t.s}</small></h3><div class="chips">${t.ideas.map((x,ii)=>`<button class="chip" data-t="${gi}|${ii}" aria-pressed="${d.tg===gi&&d.ti===ii&&!d.own}">${x}</button>`).join('')}</div></div>`).join('')}</div>
+   <label class="field">여기에 없는 이야기 쓰기<input id="tOwn" maxlength="30" value="${esc(d.own)}" placeholder="예: 동생이랑 블록으로 성을 만든 일"></label>
+   ${tp?`<div class="box lav"><div class="talk"><span class="chr">${mongi('think')}</span><div><h4>엄마랑 이야기해 봐요 <small style="font-family:var(--f-text);font-size:13px;color:var(--ink-2);font-weight:400">여기는 쓰지 않고 말로만 대답해요</small></h4><ol>${(T?T.q:TOPICS[0].q).map(q=>`<li>${q}</li>`).join('')}</ol></div></div></div>`:''}
+   ${navHTML('글 양식 고르기 →',!tp)}</section>`;
+  m.querySelector('#dice').onclick=()=>{const gi=Math.floor(Math.random()*TOPICS.length);d.tg=gi;d.ti=Math.floor(Math.random()*TOPICS[gi].ideas.length);d.own='';d.form='';save();render();toast('뽑힌 주제: '+topicText(d))};
+  m.querySelectorAll('[data-t]').forEach(b=>b.onclick=()=>{const [g,i]=b.dataset.t.split('|').map(Number);d.tg=g;d.ti=i;d.own='';d.form='';if(g===5)d.tpl=i;save();render()});
+  const o=m.querySelector('#tOwn');o.onchange=()=>{d.own=o.value.trim();if(d.own){d.form=''}save();render()}}
+
+/* ③ 양식 */
+function st2(m){const d=D(),rec=d.own?'six':recForm(d);
+  say(d.form?[`<b>${FK[d.form].t}</b>로 쓰자!`,'다음 단계에서 질문에 답하면 내가 일기 초안을 만들어 줄게.']:['오늘은 어떤 모양으로 써 볼까?',`주제를 보니 <b>${FK[rec].t}</b>가 잘 어울릴 것 같아. 다른 걸 골라도 돼!`],d.form?'cheer':'think');
+  m.innerHTML=`<section class="card"><h2><span class="circ">3</span>글 양식 고르기</h2>
+   <p class="lead">주제: <b>${esc(topicText(d))}</b></p>
+   <div class="forms">${FORMS.map(f=>`<button class="fm" data-f="${f.k}" aria-pressed="${d.form===f.k}">${f.k===rec?'<span class="rec">추천</span>':''}<span class="mini">${f.m.map((x,i)=>`<i style="left:${8+i*6}px;top:${1+i*14}px">${x}</i>`).join('')}</span><b>${f.t}</b><span>${f.d}</span><em>${f.good}</em></button>`).join('')}</div>
+   ${navHTML('재료 모으기 →',!d.form)}</section>`;
+  m.querySelectorAll('[data-f]').forEach(b=>b.onclick=()=>{d.form=b.dataset.f;save();render()})}
+
+/* ④ 재료 */
+function qChips(key,label,chips,ph,n,area){const d=D(),v=d.a[key]||'';
+  return `<div class="q"><label for="f_${key}">${n?`<span class="circ">${n}</span>`:''}${label}</label>
+   ${chips&&chips.length?`<div class="chips">${chips.map(c=>`<button class="chip" data-fk="${key}" data-v="${esc(c)}" aria-pressed="${v===c}">${esc(c)}</button>`).join('')}</div>`:''}
+   ${area?`<textarea id="f_${key}" data-a="${key}" placeholder="${esc(ph)}">${esc(v)}</textarea>`:`<input id="f_${key}" data-a="${key}" value="${esc(v)}" placeholder="${esc(ph)}" maxlength="80">`}</div>`}
+function formFields(){const d=D();
+  switch(d.form){
+   case 'six':return `<h3>육하원칙으로 쉽게 쓰는 나의 일기</h3><p class="lead">누가, 언제, 어디서, 무엇을, 어떻게, 왜를 하나씩 따라가 보세요! 칩을 누르거나 직접 써요.</p>${SIX.map((s,i)=>qChips(s[0],`${s[1]}? <small style="font-family:var(--f-text);font-size:13px;color:var(--ink-3);font-weight:400">${s[2]}</small>`,s[3],s[4],i+1)).join('')}`;
+   case 'pic':return `<h3>그림 그리기</h3><div class="pad"><div class="cw" id="cw"><canvas id="cv" width="900" height="600"></canvas></div>
+     <div class="pens" role="toolbar" aria-label="그리기 도구">${PENS.map(c=>`<button class="sw" style="background:${c}" data-c="${c}" aria-label="색" aria-pressed="${pen.c===c&&!pen.er}"></button>`).join('')}
+      <button class="tool" data-sz="4" aria-pressed="${pen.s===4}">가늘게</button><button class="tool" data-sz="9" aria-pressed="${pen.s===9}">보통</button><button class="tool" data-sz="18" aria-pressed="${pen.s===18}">굵게</button>
+      <button class="tool" id="er" aria-pressed="${pen.er}">지우개</button><button class="tool" id="undo">되돌리기</button><button class="tool" id="clr">다 지우기</button></div></div>
+     <h3>짧게 육하원칙</h3>${SIXP.map((s,i)=>qChips(s[0],s[1]+'?',s[3],s[4],i+1)).join('')}`;
+   case 'blank':{const T=GUIDE[d.tpl];return `<h3>어떤 일을 쓸까요?</h3><div class="chips">${GUIDE.map((g,i)=>`<button class="chip" data-tpl="${i}" aria-pressed="${d.tpl===i}">${g[0]}</button>`).join('')}</div>
+     <div class="box"><h4>${T[0]}</h4><div class="blank-sent"><ol>${T[1].map((t,i)=>`<li>${parseT(t).map((p,j)=>p.x?esc(p.x):p.b?`<input data-a="b${d.tpl}_${i}_${j}" value="${esc(d.a[`b${d.tpl}_${i}_${j}`]||'')}" placeholder="${esc(p.b)}" aria-label="${esc(p.b)}">`:`<span>${esc(p.p==='이다'?'(이)다':'('+p.p+')')}</span>`).join('')}</li>`).join('')}</ol></div>
+     <p class="lead">(을)(이) 같은 말은 초안을 만들 때 앞 낱말에 맞게 바뀌어요. 빈칸을 다 안 채워도 괜찮아요.</p></div>`}
+   case 'imagine':return `<h3>만약에… 상상 일기</h3>${IMAG.map((s,i)=>qChips(s[0],s[1],null,s[2],i+1,true)).join('')}`;
+   case 'letter':return `<h3>편지로 쓰는 일기</h3>${LET.map((s,i)=>qChips(s[0],s[1],s[2],s[3],i+1,i>0&&i<3)).join('')}`;
+   case 'free':return `<h3>처음 · 가운데 · 끝</h3>${FREE.map((s,i)=>qChips(s[0],s[1],null,s[2],i+1,true)).join('')}`;
+   case 'book':{const [a0,a1]=BQI[d.bqg];if(d.bq<a0||d.bq>=a1)d.bq=a0;return `<h3>독서 일기</h3>
+     ${qChips('bt','도서명',null,'예: 강아지똥',1)}${qChips('ba','작가',null,'예: 권정생',2)}
+     <div class="q"><label><span class="circ">3</span>어떤 책? · 별점</label><div class="row"><div class="chips">${['동화','그림책','과학','인물','문학','만화'].map(c=>`<button class="chip" data-fk="bg" data-v="${c}" aria-pressed="${d.a.bg===c}">${c}</button>`).join('')}</div><span class="stars" role="group" aria-label="별점">${[1,2,3,4,5].map(n=>`<button data-bs="${n}" class="${(d.a.bs||0)>=n?'on':''}" aria-label="별 ${n}개">★</button>`).join('')}</span></div></div>
+     ${qChips('b1','이런 내용이에요 (한두 문장)',null,'예: 강아지똥이 민들레를 꽃피우는 거름이 되는 이야기다.',4,true)}
+     ${qChips('b2','이 부분이 기억에 남아요',null,'예: 강아지똥이 비를 맞으며 민들레를 꼭 껴안는 장면',5,true)}
+     <div class="box lav"><h4>오늘의 독후 질문</h4><div class="chips">${BQG.map((g,i)=>`<button class="chip" data-bqg="${i}" aria-pressed="${d.bqg===i}">${g}</button>`).join('')}</div>
+      <p class="bq">Q. ${esc(BQ[d.bq])}</p><div class="row"><button class="btn sm" id="bqNext">다른 질문 보기</button></div>
+      <label class="sr" for="f_b3">질문에 대한 내 생각</label><textarea id="f_b3" data-a="b3" placeholder="내 생각을 써요" style="width:100%;min-height:60px;font-family:var(--f-text);font-size:16px;border:2px dashed var(--lav-b);border-radius:8px;padding:6px 10px;background:#fff">${esc(d.a.b3||'')}</textarea></div>`}
+  }return ''}
+function feelHTML(){const d=D();const g=FEEL[ui.fg];
+  return `<div class="box pink"><h4>오늘 내 기분은? <small style="font-family:var(--f-text);font-size:13px;color:var(--ink-2);font-weight:400">두 개까지 골라요</small></h4>
+   <div class="feel-tabs" role="group" aria-label="기분 무리">${FEEL.map((f,i)=>`<button data-fg="${i}" aria-pressed="${ui.fg===i}">${f.t}</button>`).join('')}</div>
+   <div class="chips">${g.w.map(w=>`<button class="chip" data-feel="${w[0]}" aria-pressed="${d.feels.includes(w[0])}">${w[0]} <small>${w[1]}</small></button>`).join('')}</div>
+   ${d.feels.length?`<h4>몸으로 보여 주기 <small style="font-family:var(--f-text);font-size:13px;color:var(--ink-2);font-weight:400">기분을 더 생생하게!</small></h4><div class="chips">${(FEEL.find(f=>f.w.some(w=>w[0]===d.feels[0]))||g).body.map(x=>`<button class="chip y" data-body="${esc(x)}" aria-pressed="${d.a.body===x}">${esc(x)}</button>`).join('')}</div>`:''}
+   <p class="lead">고른 기분: <b>${d.feels.length?esc(d.feels.join(', ')):'아직 없어요'}</b></p></div>`}
+const PENS=['#342A2A','#E3544B','#F6A13D','#F5D04C','#5DB36A','#4568CF','#9B6BD3','#F5A3B7','#8B5E3C'];
+const pen={c:'#342A2A',s:9,er:false};
+const ui={fg:0,tab:'feel',q:'',ptag:'',itag:'',open:''};
+function st3(m){const d=D();
+  say([`<b>${FK[d.form].t}</b> 재료를 모으자!`,'질문에 짧게 답하고 <b>오늘 기분</b>도 골라 줘. 다 모으면 다음 단계에서 초안으로 만들어 줄게.'],'happy','mongi');
+  m.innerHTML=`<section class="card"><h2><span class="circ">4</span>재료 모으기</h2>${formFields()}${feelHTML()}${navHTML('일기 쓰러 가기 →')}</section>`;
+  m.querySelectorAll('[data-a]').forEach(inp=>inp.oninput=()=>{d.a[inp.dataset.a]=inp.value;save();const k=inp.dataset.a;m.querySelectorAll(`[data-fk="${k}"]`).forEach(b=>b.setAttribute('aria-pressed',b.dataset.v===inp.value))});
+  m.querySelectorAll('[data-fk]').forEach(b=>b.onclick=()=>{const k=b.dataset.fk;d.a[k]=d.a[k]===b.dataset.v?'':b.dataset.v;save();const inp=m.querySelector(`#f_${k}`);if(inp)inp.value=d.a[k];m.querySelectorAll(`[data-fk="${k}"]`).forEach(x=>x.setAttribute('aria-pressed',x.dataset.v===d.a[k]))});
+  m.querySelectorAll('[data-tpl]').forEach(b=>b.onclick=()=>{d.tpl=+b.dataset.tpl;save();render()});
+  m.querySelectorAll('[data-bs]').forEach(b=>b.onclick=()=>{d.a.bs=+b.dataset.bs;save();m.querySelectorAll('[data-bs]').forEach(x=>x.classList.toggle('on',+x.dataset.bs<=d.a.bs))});
+  m.querySelectorAll('[data-bqg]').forEach(b=>b.onclick=()=>{d.bqg=+b.dataset.bqg;const [a0,a1]=BQI[d.bqg];d.bq=a0+Math.floor(Math.random()*(a1-a0));save();render()});
+  const bn=m.querySelector('#bqNext');if(bn)bn.onclick=()=>{const [a0,a1]=BQI[d.bqg];let n;do{n=a0+Math.floor(Math.random()*(a1-a0))}while(n===d.bq&&a1-a0>1);d.bq=n;save();render()};
+  m.querySelectorAll('[data-fg]').forEach(b=>b.onclick=()=>{ui.fg=+b.dataset.fg;render()});
+  m.querySelectorAll('[data-feel]').forEach(b=>b.onclick=()=>{const w=b.dataset.feel,i=d.feels.indexOf(w);if(i>=0)d.feels.splice(i,1);else{d.feels.push(w);if(d.feels.length>2)d.feels.shift()}if(!d.feels.length)d.a.body='';save();render()});
+  m.querySelectorAll('[data-body]').forEach(b=>b.onclick=()=>{d.a.body=d.a.body===b.dataset.body?'':b.dataset.body;save();render()});
+  if(d.form==='pic')initPad(m)}
+
+/* 그림판 */
+function initPad(m){const d=D(),cv=m.querySelector('#cv'),cx=cv.getContext('2d');const hist=[];
+  const blank=()=>{cx.fillStyle='#fff';cx.fillRect(0,0,cv.width,cv.height)};blank();
+  if(d.pic){const im=new Image();im.onload=()=>cx.drawImage(im,0,0,cv.width,cv.height);im.src=d.pic}
+  const pos=e=>{const r=cv.getBoundingClientRect();return[(e.clientX-r.left)*cv.width/r.width,(e.clientY-r.top)*cv.height/r.height]};
+  let drawing=false,last=null;
+  const store=()=>{try{d.pic=cv.toDataURL('image/png');save()}catch(e){}};
+  cv.onpointerdown=e=>{e.preventDefault();cv.setPointerCapture(e.pointerId);drawing=true;last=pos(e);hist.push(cx.getImageData(0,0,cv.width,cv.height));if(hist.length>15)hist.shift();dot(last)};
+  const dot=p=>{cx.beginPath();cx.fillStyle=pen.er?'#fff':pen.c;cx.arc(p[0],p[1],(pen.er?pen.s*2.2:pen.s)/2,0,Math.PI*2);cx.fill()};
+  cv.onpointermove=e=>{if(!drawing)return;const p=pos(e);cx.strokeStyle=pen.er?'#fff':pen.c;cx.lineWidth=pen.er?pen.s*2.2:pen.s;cx.lineCap='round';cx.lineJoin='round';cx.beginPath();cx.moveTo(last[0],last[1]);cx.lineTo(p[0],p[1]);cx.stroke();last=p};
+  const up=()=>{if(drawing){drawing=false;store()}};cv.onpointerup=up;cv.onpointercancel=up;
+  m.querySelectorAll('[data-c]').forEach(b=>b.onclick=()=>{pen.c=b.dataset.c;pen.er=false;m.querySelectorAll('[data-c]').forEach(x=>x.setAttribute('aria-pressed',x===b));m.querySelector('#er').setAttribute('aria-pressed','false')});
+  m.querySelectorAll('[data-sz]').forEach(b=>b.onclick=()=>{pen.s=+b.dataset.sz;m.querySelectorAll('[data-sz]').forEach(x=>x.setAttribute('aria-pressed',x===b))});
+  m.querySelector('#er').onclick=e=>{pen.er=!pen.er;e.currentTarget.setAttribute('aria-pressed',pen.er)};
+  m.querySelector('#undo').onclick=()=>{const h=hist.pop();if(h){cx.putImageData(h,0,0);store()}};
+  m.querySelector('#clr').onclick=()=>{hist.push(cx.getImageData(0,0,cv.width,cv.height));blank();d.pic=null;save()}}
+
+/* ⑤ 일기 쓰기 */
+let taTouched=false;
+function insertText(t){const ta=$('#body');if(!ta)return;let caret=t.indexOf('|');t=t.replace('|','');
+  const s=taTouched?ta.selectionStart:ta.value.length,e=taTouched?ta.selectionEnd:s,prev=ta.value.slice(0,s);
+  if(prev&&!/[\s(“"‘]$/.test(prev))t=' '+t,caret>=0&&caret++;
+  if(!taTouched&&prev&&!/\n$/.test(prev)&&/[.!?]$/.test(prev.trim()))t=t.replace(/^ /,'\n');
+  const nx=ta.value.slice(e,e+1);if(nx&&!/\s/.test(nx)&&!/ $/.test(t)&&caret<0)t=t+' ';
+  ta.setRangeText(t,s,e,'end');taTouched=true;if(caret>=0){const p=s+caret;ta.setSelectionRange(p,p)}
+  D().body=ta.value;save();ta.focus({preventScroll:true});updMeter();toast(`“${t.trim().slice(0,14)}” 넣었어요`)}
+function toolBody(){const d=D();
+  switch(ui.tab){
+   case 'feel':return `<p class="hint-t">기분을 그대로 쓰고, 몸으로 보여 주는 말을 붙이면 더 생생해요. 영어 낱말도 함께 익혀요.</p>${FEEL.map(g=>`<div class="grp"><h4>${g.t}</h4><div class="chips">${g.w.map(w=>`<button class="chip" data-ins="${esc(w[0])}">${w[0]} <small>${w[1]}</small></button>`).join('')}</div><div class="chips" style="margin-top:4px">${g.body.map(x=>`<button class="chip y" data-ins="${esc(end(x))}">${x}</button>`).join('')}</div></div>`).join('')}`;
+   case 'desc':return `<p class="hint-t">누르면 일기 속 커서 자리에 쏙 들어가요.</p>${DESC.map(g=>`<div class="grp"><h4>${g.t}${g.h?` <small style="font-family:var(--f-text);font-size:12px;color:var(--ink-3);font-weight:400">${g.h}</small>`:''}</h4><div class="chips">${g.w.map(w=>`<button class="chip" data-ins="${esc(w)}">${w}</button>`).join('')}</div></div>`).join('')}`;
+   case 'conn':return `<p class="hint-t">문장과 문장을 이어 주는 말이에요. 한 문장이 끝나면 다음 문장 앞에 넣어 봐요.</p>${CONN.map(g=>`<div class="grp"><h4>${g.t}</h4><div class="chips">${g.w.map(w=>`<button class="chip" data-ins="${esc(w[1])}">${w[0]}</button>`).join('')}</div></div>`).join('')}`;
+   case 'oc':return `<div class="grp"><h4>첫 문장 이렇게 시작해 봐요</h4><div class="idl">${OPEN.map(o=>`<button class="chip" style="border-radius:10px" data-ins="${esc(o[1])}"><span><small>${o[0]}</small><br>${esc(o[1])}</span></button>`).join('')}</div></div>
+     <div class="grp"><h4>마지막 문장 이렇게 끝내 봐요</h4><div class="idl">${CLOSE.map(o=>`<button class="chip" style="border-radius:10px" data-ins="${esc(o[1])}"><span><small>${o[0]}</small><br>${esc(o[1].replace('|','____'))}</span></button>`).join('')}</div></div>`;
+   case 'prov':{const q=ui.q.trim(),tag=ui.ptag;let L=PROV.map((p,i)=>[p,i+1]);if(tag)L=L.filter(x=>PTAG[tag].includes(x[1]));if(q)L=L.filter(x=>(x[0][0]+x[0][1]).includes(q));
+     return `<p class="hint-t">「초등학생이 꼬~옥! 알아야 할 속담 100」 · 오늘 일과 어울리는 속담을 찾아 넣어 봐요.</p><label class="sr" for="pq">속담 찾기</label><input class="search" id="pq" placeholder="낱말로 찾기 (예: 호랑이, 떡)" value="${esc(ui.q)}">
+      <div class="chips"><button class="chip" data-ptag="" aria-pressed="${!tag}">전체 100</button>${Object.keys(PTAG).map(t=>`<button class="chip" data-ptag="${t}" aria-pressed="${tag===t}">${t}</button>`).join('')}</div>
+      <div class="idl">${L.length?L.map(([p,n])=>`<div class="idi ${ui.open==='p'+n?'open':''}"><button data-open="p${n}" aria-expanded="${ui.open==='p'+n}"><small>${n}</small>${esc(p[0])}</button>${ui.open==='p'+n?`<div class="dd"><p>${esc(p[1])}</p><p class="exs">‘${esc(p[0])}’${P(p[0],'이라는')} 속담이 딱 맞는 하루였다.</p><div class="row"><button class="btn sm pri" data-ins="‘${esc(p[0])}’${P(p[0],'이라는')} 속담이 딱 맞는 하루였다.">일기에 넣기</button><button class="btn sm" data-ins="‘${esc(p[0])}’${P(p[0],'이라는')} 속담처럼 ">문장 앞에 넣기</button></div></div>`:''}</div>`).join(''):'<p class="hint-t">찾는 속담이 없어요. 다른 낱말로 찾아봐요.</p>'}</div>`}
+   case 'idi':{const q=ui.q.trim(),tag=ui.itag;let L=IDI;if(tag)L=L.filter(i=>i[4]===tag);if(q)L=L.filter(i=>(i[0]+i[2]).includes(q));
+     return `<p class="hint-t">네 글자로 된 한자 말이에요. 「이야기」 표시가 있는 말은 옛이야기에서 나온 고사성어예요.</p><label class="sr" for="pq">사자성어 찾기</label><input class="search" id="pq" placeholder="낱말로 찾기 (예: 친구, 노력)" value="${esc(ui.q)}">
+      <div class="chips"><button class="chip" data-itag="" aria-pressed="${!tag}">전체</button>${ITAGS.map(t=>`<button class="chip" data-itag="${t}" aria-pressed="${tag===t}">${t}</button>`).join('')}</div>
+      <div class="idl">${L.map(i=>`<div class="idi ${ui.open==='i'+i[0]?'open':''}"><button data-open="i${i[0]}" aria-expanded="${ui.open==='i'+i[0]}">${i[0]} <span class="hz">${i[1]}</span>${i[5]?'<small>이야기</small>':''}</button>${ui.open==='i'+i[0]?`<div class="dd"><p>${esc(i[2])}</p>${i[5]?`<p class="story">📖 ${esc(i[5])}</p>`:''}<p class="exs">${esc(i[3])}</p><div class="row"><button class="btn sm pri" data-ins="오늘은 ‘${i[0]}’${P(i[0],'이라는')} 말이 딱 맞는 하루였다.">일기에 넣기</button><button class="btn sm" data-ins="${esc(i[3])}">예문 그대로 넣기</button></div></div>`:''}</div>`).join('')||'<p class="hint-t">찾는 말이 없어요.</p>'}</div>`}
+  }return ''}
+const TABS=[['feel','기분'],['desc','꾸밈말'],['conn','이어 주는 말'],['oc','첫·끝 문장'],['prov','속담'],['idi','사자성어']];
+function updMeter(){const d=D(),r=analyse(d),el=$('#meter');const ti=$('#tTitle'),tn=$('#tNeed');if(ti)ti.classList.toggle('need',!d.title.trim());if(tn)tn.hidden=!!d.title.trim();if(el)el.innerHTML=`글자 <b>${r.chars}</b> · 문장 <b>${r.sents}</b> · 표현 <b>${r.descU.length+r.connU.length+r.provU.length+r.idiU.length}</b>`;
+  const ok=$('#nextW');if(ok)ok.disabled=!(d.body.trim()&&d.title.trim());
+  const st=$('#stuck');if(st)st.innerHTML=stuckHTML()}
+function stuckHTML(){const d=D(),r=analyse(d),b=d.body;const T=d.tg>=0?TOPICS[d.tg]:null;
+  const items=[['기분 낱말',r.feelU.length>0],['꾸밈말·흉내말',r.descU.length>0],['이어 주는 말',r.connU.length>0],['다섯 문장',r.sents>=5]];
+  return `<h4>막힐 때 보는 쪽지</h4><div class="chips">${items.map(x=>`<span class="chk"><i>${x[1]?'✔':'○'}</i>${x[0]}</span>`).join('')}</div>
+   ${T?`<ul>${T.q.map(q=>`<li>${q}</li>`).join('')}</ul>`:''}`}
+function st4(m){const d=D();if(!d.body.trim()){d.body=buildDraft(d);save()}
+  const sug=titleSugs(d);
+  say(d.title?['좋은 제목이야!','이제 초안을 읽어 보고 <b>더 자세히</b> 고쳐 써 봐. 오른쪽 <b>표현 주머니</b>에서 말을 골라 넣으면 일기가 반짝반짝해져.']:['재료로 <b>초안</b>을 만들어 두었어!','먼저 <b>제목</b>을 지어 봐. 아래 추천 제목을 눌러도 돼. 그다음 초안을 내 말로 고쳐 쓰자.'],d.title?'cheer':'wow');
+  m.innerHTML=`<section class="card"><h2><span class="circ">5</span>일기 쓰기</h2>
+   <div class="wlayout">
+    <div class="note">
+     <div class="nh"><b>${dlab(d.date)}</b><span style="display:inline-flex;align-items:center;gap:4px">${wIcon(d.weather)}${esc(wName(d.weather))}</span>${d.wline?`<span style="font-family:var(--f-pen);font-size:21px;color:var(--ink-2)">${esc(d.wline)}</span>`:''}</div>
+     <p class="tneed" id="tNeed" ${d.title.trim()?"hidden":""}>제목은 꼭 써요! 추천 제목을 눌러도 돼요 ↓</p><label class="sr" for="tTitle">제목</label><input class="titlein ${d.title.trim()?"":"need"}" id="tTitle" maxlength="30" placeholder="제목 (꼭 써요!)" value="${esc(d.title)}">
+     ${sug.length?`<div class="tsug"><span>추천 제목</span>${sug.map(t=>`<button class="chip" data-title="${esc(t)}">${esc(t)}</button>`).join('')}</div>`:''}
+     <label class="sr" for="body">일기 내용</label><textarea class="paper" id="body" placeholder="여기에 일기를 써요">${esc(d.body)}</textarea>
+     <div class="nfoot"><span id="meter"></span><span class="row"><button class="btn sm" id="redraft">초안 다시 만들기</button></span></div>
+    </div>
+    <aside class="tool-p" aria-label="표현 주머니"><div class="th"><h3>표현 주머니 <small>누르면 쏙!</small></h3>
+      <div class="tabs" role="tablist">${TABS.map(t=>`<button role="tab" aria-selected="${ui.tab===t[0]}" data-tab="${t[0]}">${t[1]}</button>`).join('')}</div></div>
+      <div class="tbody" id="tbody">${toolBody()}</div></aside>
+   </div>
+   <div class="box lav stuck" id="stuck">${stuckHTML()}</div>
+   <div class="nav"><button class="btn" data-prev>← 이전</button><button class="btn pri" id="nextW" data-next ${d.body.trim()&&d.title.trim()?'':'disabled'}>마음 정리하기 →</button></div></section>`;
+  const ta=m.querySelector('#body');taTouched=false;['focus','click','keyup'].forEach(ev=>ta.addEventListener(ev,()=>{taTouched=true}));ta.oninput=()=>{d.body=ta.value;save();updMeter()};
+  const ti=m.querySelector('#tTitle');ti.oninput=()=>{d.title=ti.value;save();updMeter()};
+  m.querySelectorAll('[data-title]').forEach(b=>b.onclick=()=>{d.title=b.dataset.title;ti.value=d.title;save();updMeter();say(['좋은 제목이야!','이제 초안을 읽어 보고 <b>더 자세히</b> 고쳐 써 봐. 오른쪽 <b>표현 주머니</b>에서 말을 골라 넣으면 일기가 반짝반짝해져.'],'cheer')});
+  m.querySelector('#redraft').onclick=()=>confirmIn('초안을 다시 만들까요?','지금 쓴 글이 재료로 만든 초안으로 바뀌어요.','다시 만들기',()=>{d.body=buildDraft(d);ta.value=d.body;save();updMeter()});
+  bindTools(m);updMeter()}
+function bindTools(m){const tb=m.querySelector('#tbody');
+  m.querySelectorAll('[data-tab]').forEach(b=>b.onclick=()=>{ui.tab=b.dataset.tab;ui.q='';ui.open='';m.querySelectorAll('[data-tab]').forEach(x=>x.setAttribute('aria-selected',x===b));tb.innerHTML=toolBody();tb.scrollTop=0});
+  tb.addEventListener('click',e=>{const t=e.target.closest('button');if(!t)return;
+    if(t.dataset.ins!==undefined){insertText(t.dataset.ins);return}
+    if(t.dataset.open!==undefined){ui.open=ui.open===t.dataset.open?'':t.dataset.open;const st=tb.scrollTop;tb.innerHTML=toolBody();tb.scrollTop=st;return}
+    if(t.dataset.ptag!==undefined){ui.ptag=t.dataset.ptag;ui.open='';tb.innerHTML=toolBody();return}
+    if(t.dataset.itag!==undefined){ui.itag=t.dataset.itag;ui.open='';tb.innerHTML=toolBody();return}});
+  tb.addEventListener('input',e=>{if(e.target.id==='pq'){ui.q=e.target.value;const pos=e.target.selectionStart;tb.innerHTML=toolBody();const n=tb.querySelector('#pq');n.focus();n.setSelectionRange(pos,pos)}})}
+
+/* ⑥ 마음 정리 (하루 마무리 카드) */
+const WU={
+ praise:['끝까지 포기하지 않았어','친구를 도와줬어','숙제를 먼저 끝냈어','골고루 잘 먹었어','큰 소리로 발표했어','동생에게 양보했어','정리 정돈을 잘했어'],
+ regret:['동생에게 화를 냈어','정리 정돈을 안 했어','늦잠을 잤어','게임을 너무 오래 했어','엄마 말씀을 한 번에 안 들었어','친구 말을 끝까지 안 들었어'],
+ want:['친구랑 더 놀고 싶어','책을 더 읽고 싶어','자전거를 타고 싶어','맛있는 요리를 만들어 보고 싶어','그림을 더 그리고 싶어','가족이랑 산책하고 싶어'],
+ who:['엄마','아빠','선생님','친구','할머니','할아버지','동생','나 자신'],
+ vow:['일찍 일어나기','물 많이 마시기','책 10쪽 읽기','친구에게 먼저 인사하기','바른 글씨로 쓰기','숙제 먼저 하기','고운 말 쓰기'],
+ memo:['준비물 챙기기','숙제 내기','알림장 보여 드리기','도서관 책 반납하기','실내화 가져가기','학원 가방 챙기기','물병 챙기기']};
+const R=d=>{d.r=d.r||{};d.r.memos=d.r.memos||[];return d.r};
+function wuCount(d){const r=R(d);return ['praise','regret','want','line','thanks','vow'].filter(k=>(r[k]||'').trim()).length+(r.memos.length?1:0)}
+function wuLines(d){const r=R(d),L=[];
+  if(r.praise)L.push(['나에게 칭찬',r.praise]);if(r.regret)L.push(['반성할 점',r.regret]);if(r.want)L.push(['하고 싶은 것',r.want]);
+  if(r.line)L.push(['기억에 남은 한 문장',`“${r.line}”`]);if(r.thanks)L.push(['감사한 마음',(r.who?r.who+(['엄마','아빠','선생님','할머니','할아버지'].includes(r.who)?'께':'에게')+' · ':'')+r.thanks]);
+  if(r.vow)L.push(['내일의 다짐',r.vow]);return L}
+function sentsOf(b){return (String(b||'').match(/[^.!?\n]+[.!?]+/g)||[]).map(s=>s.trim()).filter(s=>s.length>4)}
+function wuField(key,n,label,ph,chips,hint){const r=R(D());
+  return `<div class="q"><label for="r_${key}"><span class="circ">${n}</span>${label}</label>${hint?`<p class="ex">${hint}</p>`:''}
+   ${chips?`<div class="chips">${chips.map(c=>`<button class="chip" data-rk="${key}" data-v="${esc(c)}" aria-pressed="${r[key]===c}">${esc(c)}</button>`).join('')}</div>`:''}
+   <input id="r_${key}" data-r="${key}" value="${esc(r[key]||'')}" placeholder="${esc(ph)}" maxlength="80"></div>`}
+function memoHTML(memos,editable){return `<ul class="memos">${memos.map((x,i)=>`<li class="${x.done?'done':''}"><label><input type="checkbox" data-mi="${i}" ${x.done?'checked':''}><span class="cb ${x.done?'on':''}"></span><span class="mt">${esc(x.t)}</span></label>${editable?`<button class="mdel" data-md="${i}" aria-label="${esc(x.t)} 지우기">×</button>`:''}</li>`).join('')}</ul>`}
+function st5(m){const d=D(),r=R(d),n=wuCount(d),ss=sentsOf(d.body);
+  say(n>=4?['마음 정리 카드가 꽉 찼네!','칭찬도 하고, 고마운 사람도 떠올리고, 내일 할 일까지 챙겼어. 멋져!']:['일기를 다 썼으면 <b>오늘 하루를 정리</b>해 보자.','나에게 칭찬 한마디, 고마운 사람, 내일 꼭 기억할 일을 적어 두면 내일의 내가 고마워할 거야.'],n>=4?'cheer':'happy','mongi');
+  m.innerHTML=`<section class="card"><h2><span class="circ">6</span>마음 정리</h2>
+   <p class="lead">하루를 돌아보는 카드예요. 칩을 누르거나 직접 써요. 세 칸 넘게 채우면 점검표에 체크돼요. (지금 ${n}칸)</p>
+   <div class="wu-grid">
+    <div class="box wu1"><h4>나에게</h4>
+     ${wuField('praise',1,'오늘 나를 칭찬해요','예: 받아쓰기를 끝까지 집중해서 했어',WU.praise)}
+     ${wuField('regret',2,'오늘 반성할 점','예: 동생 장난감을 허락 없이 썼어',WU.regret)}
+     ${wuField('want',3,'요즘 하고 싶은 것','예: 공룡 박물관에 가 보고 싶어',WU.want)}</div>
+    <div class="box lav wu2"><h4>마음에 남은 것</h4>
+     <div class="q"><label for="r_line"><span class="circ">4</span>기억에 남은 한 문장</label><p class="ex">오늘 일기에서 고르거나, 오늘 들은 말·읽은 문장을 써요.</p>
+      ${ss.length?`<div class="chips">${ss.slice(0,8).map(s=>`<button class="chip" data-rk="line" data-v="${esc(s)}" aria-pressed="${r.line===s}">${esc(s.length>28?s.slice(0,27)+'…':s)}</button>`).join('')}</div>`:''}
+      <input id="r_line" data-r="line" value="${esc(r.line||'')}" placeholder="예: 선생님이 “실수해도 괜찮아”라고 하셨다" maxlength="80"></div>
+     <div class="q"><label for="r_thanks"><span class="circ">5</span>감사한 마음</label>
+      <div class="chips">${WU.who.map(c=>`<button class="chip y" data-rk="who" data-v="${c}" aria-pressed="${r.who===c}">${c}</button>`).join('')}</div>
+      <input id="r_thanks" data-r="thanks" value="${esc(r.thanks||'')}" placeholder="${r.who?esc(r.who)+P(r.who,'이')+' 무엇을 해 줘서 고마웠나요?':'예: 엄마, 맛있는 김밥을 싸 주셔서 고마워요'}" maxlength="80"></div></div>
+    <div class="box pink wu3"><h4>내일을 위해</h4>
+     ${wuField('vow',6,'내일의 다짐','예: 내일은 일찍 일어나서 아침밥을 꼭 먹을 거야',WU.vow)}
+     <div class="q"><label for="memoIn"><span class="circ">7</span>내일 꼭 기억할 일 · 메모 체크</label><p class="ex">적어 두면 첫 화면에 나와요. 다 하면 체크해요!</p>
+      <div class="chips">${WU.memo.map(c=>`<button class="chip" data-mq="${esc(c)}" ${r.memos.some(x=>x.t===c)?'aria-pressed="true"':''}>+ ${esc(c)}</button>`).join('')}</div>
+      <div class="row"><input id="memoIn" placeholder="예: 리코더 가져가기" maxlength="40" style="flex:1;min-width:0"><button class="btn sm" id="memoAdd">추가</button></div>
+      ${r.memos.length?memoHTML(r.memos,true):'<p class="ex">아직 메모가 없어요.</p>'}</div></div>
+   </div>
+   <div class="nav"><button class="btn" data-prev>← 일기 고치기</button><button class="btn pri" data-next>다 썼어요 →</button></div></section>`;
+  m.querySelectorAll('[data-r]').forEach(inp=>inp.oninput=()=>{r[inp.dataset.r]=inp.value;save();m.querySelectorAll(`[data-rk="${inp.dataset.r}"]`).forEach(b=>b.setAttribute('aria-pressed',b.dataset.v===inp.value))});
+  m.querySelectorAll('[data-rk]').forEach(b=>b.onclick=()=>{const k=b.dataset.rk;r[k]=r[k]===b.dataset.v?'':b.dataset.v;save();render()});
+  const add=t=>{t=t.trim();if(!t||r.memos.some(x=>x.t===t))return;r.memos.push({t,done:false});save();render()};
+  m.querySelectorAll('[data-mq]').forEach(b=>b.onclick=()=>add(b.dataset.mq));
+  const mi=m.querySelector('#memoIn');m.querySelector('#memoAdd').onclick=()=>add(mi.value);mi.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();add(mi.value)}};
+  m.querySelectorAll('[data-md]').forEach(b=>b.onclick=()=>{r.memos.splice(+b.dataset.md,1);save();render()});
+  m.querySelectorAll('[data-mi]').forEach(c=>c.onchange=()=>{r.memos[+c.dataset.mi].done=c.checked;save();render()})}
+
+/* ⑦ 다 썼어요 */
+function st6(m){
+const d=D(),c=checks(d),s=starsOf(d),r=analyse(d);
+  const miss=c.filter(x=>!x[1]&&x[3]!=='bonus');
+  say(s>=3?[`우와, <b>별 세 개</b>! 정말 멋진 일기야.`,'일기장에 넣고 엄마에게도 보내 줘. 엄마가 엄청 기뻐할 거야!']:[`여기까지 쓴 것도 정말 잘했어!`,miss.length?`<b>${esc(miss[0][0])}</b>에 도전하면 별을 더 받을 수 있어.`:'일기장에 넣고 엄마에게 보내 줘!'],s>=3?'cheer':'happy');
+  m.innerHTML=`<section class="card"><h2><span class="circ">7</span>다 썼어요!</h2>
+   <div class="done-top">
+    <div style="display:flex;flex-direction:column;gap:12px;min-width:0">
+     <div class="award"><div class="stampbig">참<br>잘했어요</div><div><div class="bigstar" aria-label="별 ${s}개">${'★'.repeat(s)}<span class="off">${'★'.repeat(3-s)}</span></div><p class="lead">스스로 점검 ${c.filter(x=>x[1]&&x[3]!=='bonus').length} / ${NBASE}</p></div></div>
+     <ul class="checks">${c.map((x,i)=>x[3]==='manual'?`<li><label for="manual"><input type="checkbox" id="manual" ${d.manual?'checked':''}><span class="cb ${d.manual?'on':''}"></span>${x[0]}</label></li>`:`<li><span class="cb ${x[1]?'on':''}"></span><span>${x[0]} ${x[2]?`<small>${esc(x[2])}</small>`:''}</span></li>`).join('')}</ul>
+     ${(r.feelU.length+r.descU.length+r.connU.length+r.provU.length+r.idiU.length)?`<div><h3 style="font-size:22px;margin-bottom:6px">내가 쓴 멋진 표현</h3><div class="used">${r.feelU.map(x=>`<span class="f">${x}</span>`).join('')}${r.descU.map(x=>`<span>${x}</span>`).join('')}${r.connU.map(x=>`<span class="c">${x}</span>`).join('')}${[...r.provU,...r.idiU].map(x=>`<span class="p">${x}</span>`).join('')}</div></div>`:''}
+     <div class="row"><button class="btn" data-prev>← 더 고치기</button><button class="btn pri" id="saveE">${d.id?'일기장에 다시 넣기':'일기장에 넣기'}</button><button class="btn soft" id="sendE">엄마에게 보내기</button></div>
+    </div>
+    <div style="min-width:0">${pageHTML(d)}</div>
+   </div></section>`;
+  fitGrid(m);
+  m.querySelector('#manual').onchange=e=>{d.manual=e.target.checked;save();render()};
+  m.querySelector('#sendE').onclick=()=>openSend(d);
+  m.querySelector('#saveE').onclick=()=>{const e=JSON.parse(JSON.stringify(d));e.savedAt=Date.now();
+    if(d.id){const i=S.entries.findIndex(x=>x.id===d.id);if(i>=0)S.entries[i]=e;else S.entries.push(e)}else{e.id='d'+Date.now();S.entries.push(e)}
+    S.draft=null;save();view='home';render();scrollTo({top:0});toast('일기장에 넣었어요! 도장 쾅 💮')}}
+
+function render(){if(view==='write'&&S.draft)renderWrite();else{view='home';renderHome()}}
+let rz;addEventListener('resize',()=>{clearTimeout(rz);rz=setTimeout(()=>fitGrid(document),200)});
+render();
+})();
+</script>
+
+
+</body>
+</html>
