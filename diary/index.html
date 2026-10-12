@@ -313,6 +313,32 @@ p{margin:0}
 .wu-memo ul{margin:4px 0 0;padding:0;list-style:none;font-family:var(--f-text);font-size:15px;display:flex;flex-wrap:wrap;gap:4px 14px}
 @media (max-width:980px){.wu-grid{grid-template-columns:minmax(0,1fr)}}
 @media (max-width:480px){.wu-page dl div{grid-template-columns:minmax(0,1fr);gap:0}}
+.ocr{border:2.5px solid var(--blue);background:var(--blue-soft);border-radius:8px;padding:12px 16px;display:flex;flex-direction:column;gap:10px}
+.ocr.off{border-style:dashed}
+.ocr h4{font-size:24px;display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 10px}
+.ocr h4 small{font-family:var(--f-pen);font-size:20px;color:var(--blue);font-weight:400}
+.ocr label.btn{cursor:pointer}
+.ocr input[type=file]:focus-visible + *{outline:3px solid var(--blue)}
+.thumbs{display:flex;flex-wrap:wrap;gap:8px}
+.thumbs:empty{display:none}
+.thumbs figure{margin:0;position:relative;width:110px;height:110px;border:2px solid var(--ink);border-radius:6px;overflow:hidden;background:#fff}
+.thumbs img{width:100%;height:100%;object-fit:cover;display:block}
+.thumbs .mdel{position:absolute;top:2px;right:2px;background:#fff;border-radius:50%;width:26px;height:26px;padding:0;border:2px solid var(--ink);color:var(--ink);font-size:18px}
+.ocr-res{background:#fff;border:2px solid #C9D5F2;border-radius:8px;padding:12px 14px;display:flex;flex-direction:column;gap:10px;animation:pop .2s ease}
+.ocr-praise{display:flex;gap:10px;align-items:flex-start;background:var(--pink-soft);border:2px solid var(--pink-b);border-radius:10px;padding:8px 12px}
+.ocr-praise .chr{width:64px}
+.ocr-praise p{font-family:var(--f-text);font-size:15.5px;line-height:1.7}
+.ocr-praise b{font-family:var(--f-hand);font-size:19px;color:var(--coral)}
+.ocr-cols{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.ocr-cols > div{min-width:0}
+.ocr-res h5{font-family:var(--f-hand);font-size:20px;margin:0 0 4px}
+.ocr-res h5 small{font-family:var(--f-text);font-size:12px;color:var(--ink-3);font-weight:400}
+.ocr-txt{font-family:var(--f-text);font-size:16px;line-height:1.9;background:var(--peach);border-radius:6px;padding:8px 12px;white-space:normal}
+.ocr-txt mark{background:var(--hl-y);color:var(--ink);border-radius:3px;padding:0 2px}
+.edits{margin:0;padding-left:20px;font-family:var(--f-text);font-size:15.5px;line-height:1.9}
+.edits s{color:var(--coral)}
+.edits small{color:var(--ink-2);font-size:13px}
+@media (max-width:640px){.ocr-cols{grid-template-columns:minmax(0,1fr)}}
 /* 일기장 미리보기 (깍두기 공책) */
 .dpage{background:#fff;border:2.5px solid var(--ink);border-radius:6px;padding:14px 16px 18px;display:flex;flex-direction:column;gap:10px;min-width:0}
 .dhead{display:flex;flex-wrap:wrap;gap:4px 16px;align-items:center;font-size:20px;border-bottom:2px solid var(--ink);padding-bottom:6px}
@@ -694,6 +720,7 @@ function msgOf(d){const r=analyse(d),c=checks(d),s=starsOf(d);
   const u=[...r.descU.map(x=>x+'(꾸밈말)'),...r.connU.map(x=>x+'(이어 주는 말)'),...r.provU.map(x=>x+'(속담)'),...r.idiU.map(x=>x+'(사자성어)')];
   if(u.length)L.push(`사용한 표현: ${u.slice(0,10).join(', ')}`);
   L.push(`글자 수 ${r.chars}자 · ${r.sents}문장`);
+  if(d.ocr&&d.ocr.edits){L.push('');L.push(`[달달쌤 첨삭${d.ocr.src==='photo'?' · 공책 사진':''}] 고친 곳 ${d.ocr.edits.length}군데`);d.ocr.edits.forEach(e=>L.push(`· ${e.from} → ${e.to}${e.why?' ('+e.why+')':''}`));if(d.ocr.praise)L.push(`칭찬: ${d.ocr.praise}`);if(d.ocr.tip)L.push(`다음엔: ${d.ocr.tip}`)}
   if(d.pic)L.push('(그림일기 그림은 화면을 캡처해서 함께 보내요)');
   return L.join('\n')}
 function openSend(d){const text=msgOf(d);
@@ -912,6 +939,63 @@ function initPad(m){const d=D(),cv=m.querySelector('#cv'),cx=cv.getContext('2d')
   m.querySelector('#undo').onclick=()=>{const h=hist.pop();if(h){cx.putImageData(h,0,0);store()}};
   m.querySelector('#clr').onclick=()=>{hist.push(cx.getImageData(0,0,cv.width,cv.height));blank();d.pic=null;save()}}
 
+/* ---------- 공책 사진 → 글씨 읽기 + 첨삭 (Claude) ---------- */
+let SAMPLE_FN=null,IMG_OK=false,IMG_MAX=1,IMG_TYPES='image/*';
+(async()=>{try{if(!window.claude?.use)return;const s=await window.claude.use('sample');if(!s)return;SAMPLE_FN=s;
+  const l=await s.limits().catch(()=>null);IMG_OK=!!l?.images;if(l?.images){IMG_MAX=Math.min(3,l.images.maxCount||1);IMG_TYPES=(l.images.mediaTypes||[]).join(',')||'image/*'}
+  if(view==='write'&&D()&&D().step===4)render()}catch(e){}})();
+let ocrFiles=[],ocrCtl=null,ocrBusy=false;
+const OCR_ERR={not_granted:'Claude 사용을 허락하지 않아서 글씨를 읽을 수 없어요. 직접 써 주세요.',sampling_disabled:'이 계정에서는 글씨 읽기를 쓸 수 없어요.',rate_limited:'지금은 너무 많이 썼어요. 조금 뒤에 다시 눌러 주세요.',session_expired:'다시 로그인해 주세요.',image_rejected:'이 사진은 읽을 수 없어요. 다른 사진을 골라 주세요.',images_unavailable:'이 화면에서는 사진을 보낼 수 없어요.',refused:'이 사진은 첨삭할 수 없어요.',invalid_json:'답을 정리하지 못했어요. 한 번 더 눌러 주세요.',empty_completion:'글씨를 찾지 못했어요. 공책이 잘 보이게 다시 찍어 주세요.'};
+function ocrPrompt(d,fromText){const ctx=[`날짜: ${dlab(d.date)}`,d.wline?`날씨: ${d.wline}`:'',topicText(d)?`주제: ${topicText(d)}`:'',d.title?`제목: ${d.title}`:''].filter(Boolean).join(' / ');
+  return `너는 초등학교 2학년 ${kid()}의 일기를 봐 주는 다정한 선생님 "달달쌤"이야.
+${fromText?'아래는 아이가 쓴 일기 글이야.':'사진은 아이가 공책에 손으로 쓴 일기야(여러 장이면 순서대로 이어 읽어). 먼저 손글씨를 그대로 옮겨 적어.'}
+${ctx}
+
+규칙:
+- read: 아이가 쓴 글을 맞춤법이 틀려도 고치지 말고 그대로 옮겨. 문단이 바뀌면 줄바꿈(\\n). 도저히 못 읽는 글자는 [?]로 써. 날짜·날씨·제목 줄은 read에 넣지 말고 title에만 따로.
+- fixed: read를 맞춤법, 띄어쓰기, 문장부호, 아주 어색한 말만 고친 글. 아이의 말투와 내용은 그대로 두고 새 내용을 지어내지 마.
+- edits: 고친 곳마다 {"from":"틀린 말","to":"고친 말","why":"초등 2학년이 알아듣는 15자 안쪽 이유"}. 최대 12개, 중요한 것부터.
+- praise: 잘 쓴 점 하나를 구체적으로 칭찬 (한두 문장, 다정한 반말).
+- tip: 다음에 더 잘 쓰는 방법 딱 하나 (흉내 내는 말, 기분 쓰기, 이어 주는 말 같은 것). 한두 문장.
+- title: 공책에 제목이 있으면 그 제목(고친 맞춤법으로), 없으면 빈 문자열.
+${fromText?'\n아이의 글:\n'+String(d.body||'').slice(0,6000)+'\n':''}
+JSON 객체 하나만 답해: {"read":"","fixed":"","edits":[{"from":"","to":"","why":""}],"praise":"","tip":"","title":""}`}
+function markFixed(fixed,edits){let h=esc(fixed);(edits||[]).map(e=>String(e.to||'').trim()).filter(t=>t.length>0).sort((a,b)=>b.length-a.length).forEach(t=>{const et=esc(t);if(h.includes(et))h=h.split(et).join('\u0001'+et+'\u0002')});return h.replace(/\u0001/g,'<mark>').replace(/\u0002/g,'</mark>').replace(/\n/g,'<br>')}
+function ocrHTML(){const d=D(),o=d.ocr;
+  if(!SAMPLE_FN)return `<div class="ocr off"><h4>📷 공책 사진으로 쓰기</h4><p class="lead">공책에 쓴 일기를 사진으로 찍으면 글자로 바꾸고 첨삭해 주는 기능이에요. claude.ai 링크로 열었을 때 쓸 수 있어요. 지금은 아래 공책에 직접 써 주세요.</p></div>`;
+  return `<div class="ocr"><div class="ocr-h"><h4>📷 공책 사진으로 쓰기 <small>타자가 어려우면 공책에 쓰고 사진만 찍어요</small></h4></div>
+   ${IMG_OK?`<div class="row">
+     <label class="btn pri" for="camIn">📸 사진 찍기</label><input type="file" id="camIn" accept="image/*" capture="environment" class="sr">
+     <label class="btn" for="picIn">🖼 앨범에서 고르기</label><input type="file" id="picIn" accept="${esc(IMG_TYPES)}" ${IMG_MAX>1?'multiple':''} class="sr">
+     <span class="lead">${IMG_MAX>1?`공책 ${IMG_MAX}쪽까지`:'한 장씩'} 올릴 수 있어요</span></div>
+   <div class="thumbs" id="thumbs">${ocrFiles.map((f,i)=>`<figure><img src="${URL.createObjectURL(f)}" alt="공책 사진 ${i+1}"><button class="mdel" data-rm="${i}" aria-label="사진 ${i+1} 빼기">×</button></figure>`).join('')}</div>`:'<p class="lead">이 화면에서는 사진을 보낼 수 없어요. 대신 아래에 쓴 글을 첨삭받을 수 있어요.</p>'}
+   <div class="row">${IMG_OK?`<button class="btn soft" id="ocrGo" ${ocrFiles.length&&!ocrBusy?'':'disabled'}>글씨 읽고 첨삭받기</button>`:''}<button class="btn" id="ocrText" ${ocrBusy||!d.body.trim()?'disabled':''}>지금 쓴 글 첨삭받기</button>${ocrBusy?'<button class="btn sm" id="ocrStop">멈추기</button>':''}<span class="status" id="ocrSt" aria-live="polite">${ocrBusy?'달달쌤이 읽는 중이에요… (30초쯤 걸려요)':''}</span></div>
+   ${o?`<div class="ocr-res">
+     <div class="ocr-praise"><span class="chr">${daldal('cheer')}</span><div><p><b>칭찬해요!</b> ${esc(o.praise||'')}</p>${o.tip?`<p><b>다음엔 이렇게!</b> ${esc(o.tip)}</p>`:''}</div></div>
+     <div class="ocr-cols"><div><h5>내가 쓴 글 <small>사진에서 읽은 그대로</small></h5><p class="ocr-txt">${esc(o.read||'').replace(/\n/g,'<br>')}</p></div>
+      <div><h5>고친 글 <small>노란 곳이 고친 부분</small></h5><p class="ocr-txt">${markFixed(o.fixed||'',o.edits)}</p></div></div>
+     ${o.edits&&o.edits.length?`<h5>고친 곳 ${o.edits.length}군데</h5><ul class="edits">${o.edits.map(e=>`<li><s>${esc(e.from)}</s> → <b>${esc(e.to)}</b>${e.why?` <small>${esc(e.why)}</small>`:''}</li>`).join('')}</ul>`:'<p class="lead">고칠 곳이 없어요. 맞춤법 백 점!</p>'}
+     <div class="row"><button class="btn pri" data-use="fixed">고친 글을 일기에 넣기</button><button class="btn" data-use="read">내가 쓴 그대로 넣기</button>${o.title&&!d.title.trim()?`<button class="btn soft" data-usetitle>제목 「${esc(o.title)}」 쓰기</button>`:''}</div>
+     <p class="ex">글을 넣은 뒤에도 아래 공책에서 얼마든지 고칠 수 있어요. 첨삭 결과는 엄마에게 보내기에도 함께 들어가요.</p></div>`:''}
+  </div>`}
+function bindOcr(m){const d=D();
+  const take=fl=>{const arr=[...(fl||[])].filter(f=>/^image\//.test(f.type));if(!arr.length)return;ocrFiles=[...ocrFiles,...arr].slice(-IMG_MAX);render()};
+  ['camIn','picIn'].forEach(id=>{const i=m.querySelector('#'+id);if(i)i.onchange=()=>take(i.files)});
+  m.querySelectorAll('[data-rm]').forEach(b=>b.onclick=()=>{ocrFiles.splice(+b.dataset.rm,1);render()});
+  const run=async fromText=>{if(ocrBusy||!SAMPLE_FN)return;ocrBusy=true;ocrCtl=new AbortController();render();
+    try{const opt={signal:ocrCtl.signal,cache:false};if(!fromText)opt.images=ocrFiles.slice(0,IMG_MAX);
+      const r=await SAMPLE_FN.json(ocrPrompt(d,fromText),opt);
+      if(!r||typeof r!=='object'||!(r.read||r.fixed))throw{code:'empty_completion'};
+      d.ocr={read:String(r.read||''),fixed:String(r.fixed||r.read||''),edits:(Array.isArray(r.edits)?r.edits:[]).slice(0,12).map(e=>({from:String(e?.from||''),to:String(e?.to||''),why:String(e?.why||'')})).filter(e=>e.from||e.to),praise:String(r.praise||''),tip:String(r.tip||''),title:String(r.title||''),src:fromText?'text':'photo'};
+      save();ocrBusy=false;render();say(['다 읽었어! 고친 곳을 같이 살펴보자.','노랗게 칠한 곳이 고친 부분이야. 마음에 들면 <b>고친 글을 일기에 넣기</b>를 눌러 줘.'],'cheer');toast('첨삭이 끝났어요!')}
+    catch(e){ocrBusy=false;render();if(e?.code!=='cancelled'){const st=$('#ocrSt');if(st)st.textContent=OCR_ERR[e?.code]||'잠깐 연결이 끊겼어요. 다시 눌러 주세요.'}}};
+  const go=m.querySelector('#ocrGo');if(go)go.onclick=()=>run(false);
+  const tx=m.querySelector('#ocrText');if(tx)tx.onclick=()=>run(true);
+  const sp=m.querySelector('#ocrStop');if(sp)sp.onclick=()=>ocrCtl&&ocrCtl.abort();
+  m.querySelectorAll('[data-use]').forEach(b=>b.onclick=()=>{const t=d.ocr[b.dataset.use]||'';const put=()=>{d.body=t;save();render();toast('일기에 넣었어요!')};
+    if(d.body.trim()&&d.body.trim()!==t.trim())confirmIn('공책 글을 바꿀까요?','지금 공책에 있는 글이 사진에서 읽은 글로 바뀌어요.','바꾸기',put);else put()});
+  const ut=m.querySelector('[data-usetitle]');if(ut)ut.onclick=()=>{d.title=d.ocr.title;save();render()}}
+
 /* ⑤ 일기 쓰기 */
 let taTouched=false;
 function insertText(t){const ta=$('#body');if(!ta)return;let caret=t.indexOf('|');t=t.replace('|','');
@@ -949,6 +1033,7 @@ function st4(m){const d=D();if(!d.body.trim()){d.body=buildDraft(d);save()}
   const sug=titleSugs(d);
   say(d.title?['좋은 제목이야!','이제 초안을 읽어 보고 <b>더 자세히</b> 고쳐 써 봐. 오른쪽 <b>표현 주머니</b>에서 말을 골라 넣으면 일기가 반짝반짝해져.']:['재료로 <b>초안</b>을 만들어 두었어!','먼저 <b>제목</b>을 지어 봐. 아래 추천 제목을 눌러도 돼. 그다음 초안을 내 말로 고쳐 쓰자.'],d.title?'cheer':'wow');
   m.innerHTML=`<section class="card"><h2><span class="circ">5</span>일기 쓰기</h2>
+   ${ocrHTML()}
    <div class="wlayout">
     <div class="note">
      <div class="nh"><b>${dlab(d.date)}</b><span style="display:inline-flex;align-items:center;gap:4px">${wIcon(d.weather)}${esc(wName(d.weather))}</span>${d.wline?`<span style="font-family:var(--f-pen);font-size:21px;color:var(--ink-2)">${esc(d.wline)}</span>`:''}</div>
@@ -967,7 +1052,7 @@ function st4(m){const d=D();if(!d.body.trim()){d.body=buildDraft(d);save()}
   const ti=m.querySelector('#tTitle');ti.oninput=()=>{d.title=ti.value;save();updMeter()};
   m.querySelectorAll('[data-title]').forEach(b=>b.onclick=()=>{d.title=b.dataset.title;ti.value=d.title;save();updMeter();say(['좋은 제목이야!','이제 초안을 읽어 보고 <b>더 자세히</b> 고쳐 써 봐. 오른쪽 <b>표현 주머니</b>에서 말을 골라 넣으면 일기가 반짝반짝해져.'],'cheer')});
   m.querySelector('#redraft').onclick=()=>confirmIn('초안을 다시 만들까요?','지금 쓴 글이 재료로 만든 초안으로 바뀌어요.','다시 만들기',()=>{d.body=buildDraft(d);ta.value=d.body;save();updMeter()});
-  bindTools(m);updMeter()}
+  bindTools(m);bindOcr(m);updMeter()}
 function bindTools(m){const tb=m.querySelector('#tbody');
   m.querySelectorAll('[data-tab]').forEach(b=>b.onclick=()=>{ui.tab=b.dataset.tab;ui.q='';ui.open='';m.querySelectorAll('[data-tab]').forEach(x=>x.setAttribute('aria-selected',x===b));tb.innerHTML=toolBody();tb.scrollTop=0});
   tb.addEventListener('click',e=>{const t=e.target.closest('button');if(!t)return;
