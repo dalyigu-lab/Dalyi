@@ -1,0 +1,543 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>포텐시아 몬테소리 사전 상담지</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gaegu:wght@400;700&family=Nanum+Pen+Script&family=Gowun+Dodum&display=swap">
+<style>
+/* 글분석 학습지와 같은 모습(흰 종이 만화 카드)으로 맞춘 페이지: 한 가지 밝은 모습으로만 디자인하고 배경·글자색을 모두 직접 지정합니다. */
+:root{
+  color-scheme:light;
+  --bg:#FFFFFF; --ink:#342A2A; --ink-2:#6C5F5F; --ink-3:#A89B9B;
+  --pink:#F5A3B7; --pink-soft:#FDE7ED; --pink-b:#EE9DB1;
+  --lav:#F6E3F4; --lav-b:#E2A6D7;
+  --lime:#EAF7CB; --peach:#FFF3E6; --peach-b:#F7CDA4;
+  --blue:#4568CF; --blue-soft:#EAF0FC; --sky-b:#9DC4F0; --coral:#E3544B; --coral-d:#C9433B;
+  --hl:#FFD2DC; --hl-y:#FFE7A3; --hl-g:#D9F0B8;
+  --line:#E6DCDC;
+  --f-hand:'Gaegu','Gowun Dodum','Apple SD Gothic Neo','Malgun Gothic',sans-serif;
+  --f-pen:'Nanum Pen Script','Gaegu','Apple SD Gothic Neo',cursive;
+  --f-text:'Gowun Dodum','Apple SD Gothic Neo','Malgun Gothic','Noto Sans KR',sans-serif;
+}
+*{box-sizing:border-box}
+html,body{background:var(--bg);color:var(--ink)}
+body{word-break:keep-all;overflow-wrap:anywhere;font-family:var(--f-hand);font-size:19px;line-height:1.5;-webkit-font-smoothing:antialiased}
+button{font:inherit;color:inherit;cursor:pointer}
+button:focus-visible,input:focus-visible,textarea:focus-visible{outline:3px solid var(--blue);outline-offset:3px}
+.wrap{max-width:860px;margin:0 auto;padding-inline:16px;padding-block:18px 130px}
+.tnum{font-variant-numeric:tabular-nums}
+.hl{background:linear-gradient(to bottom,transparent 55%,var(--hl) 55%,var(--hl) 92%,transparent 92%);padding:0 3px}
+.hl-y{background:linear-gradient(to bottom,transparent 55%,var(--hl-y) 55%,var(--hl-y) 92%,transparent 92%);padding:0 3px}
+.hl-g{background:linear-gradient(to bottom,transparent 55%,var(--hl-g) 55%,var(--hl-g) 92%,transparent 92%);padding:0 3px}
+.red{color:var(--coral)}
+.doodle{font-family:var(--f-pen);color:var(--coral);font-size:24px;line-height:1;display:inline-block;transform:rotate(-8deg);white-space:nowrap;pointer-events:none}
+.chr{display:block;flex:none;width:110px}
+.chr svg{display:block;width:100%;height:auto;overflow:visible}
+.bob{animation:bob 2.6s ease-in-out infinite}
+@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
+@keyframes pop{from{opacity:0;transform:scale(.96)}to{opacity:1;transform:none}}
+
+/* 말풍선 */
+.bubble{position:relative;background:var(--lime);border:2.5px solid var(--ink);border-radius:46% 54% 48% 52% / 58% 50% 50% 42%;padding:14px 24px;text-align:center;font-weight:700}
+.bubble.l::after{content:'';position:absolute;left:-10px;bottom:22px;width:18px;height:18px;background:inherit;border-left:2.5px solid var(--ink);border-bottom:2.5px solid var(--ink);transform:rotate(30deg) skewX(-10deg)}
+.bubble.b::after{content:'';position:absolute;left:34px;bottom:-10px;width:18px;height:18px;background:inherit;border-right:2.5px solid var(--ink);border-bottom:2.5px solid var(--ink);transform:rotate(40deg)}
+.bubble.pink{background:var(--pink-soft);border-color:var(--pink-b);border-radius:18px}
+.bubble.pink::after{border-color:var(--pink-b)}
+
+/* 첫 화면 머리 */
+.hero{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:12px 24px;align-items:end;padding-block:6px 10px}
+.kicker{font-size:17px;color:var(--ink-2);margin:0}
+.brand{font-family:var(--f-hand);font-weight:700;font-size:clamp(40px,7vw,64px);line-height:1.05;margin:6px 0 0;letter-spacing:-.02em}
+.brand .red{white-space:nowrap}
+.sub{font-size:21px;margin:12px 0 0;font-weight:700}
+.hero-c{position:relative;display:flex;flex-direction:column;align-items:center;gap:14px}
+.hero-c .pair{display:flex;align-items:flex-end;gap:6px}
+.hero-c .bubble{max-width:260px;font-size:19px}
+.hero-c .d1{position:absolute;right:6px;top:4px}
+
+/* 단계 레일 */
+.rail-wrap{overflow-x:auto;margin-block:14px 18px;scrollbar-width:thin}
+.rail{display:flex;gap:6px;list-style:none;margin:0;padding:2px 2px 6px;min-width:max-content}
+.rail li{font-size:17px;padding:2px 12px;border-radius:999px;border:2px solid #E6DEDE;color:var(--ink-3);white-space:nowrap;display:inline-flex;gap:4px;align-items:center;background:#fff}
+.rail li.on{border-color:var(--coral);color:var(--coral);background:var(--pink-soft);font-weight:700}
+.rail li.fin{color:var(--ink);border-color:var(--ink-3)}
+.rail li.fin::before{content:'✔';color:var(--coral)}
+
+/* 단계 카드 */
+.card{position:relative;background:#fff;border:2.5px solid var(--c,var(--peach-b));border-radius:6px;padding:16px 18px 20px;display:grid;gap:18px;animation:pop .2s ease}
+.card[data-step="1"]{--c:var(--pink-b)} .card[data-step="2"]{--c:var(--peach-b)} .card[data-step="3"]{--c:var(--lav-b)} .card[data-step="4"]{--c:var(--sky-b)} .card[data-step="5"]{--c:var(--pink-b)} .card[data-step="6"]{--c:var(--peach-b)}
+.ask{display:flex;gap:6px;align-items:flex-end;margin:0}
+.ask .chr{width:84px}
+.ask .bubble{flex:1;font-size:22px;line-height:1.45;text-align:left;margin-left:12px;border-radius:26px;padding:12px 18px}
+.ask .bubble small{display:block;font-size:17px;font-weight:400;color:var(--ink-2)}
+.sec{display:flex;align-items:center;gap:8px;margin:0;font-size:26px;line-height:1.1}
+.circ{display:inline-grid;place-items:center;width:36px;height:36px;border:2.5px solid var(--ink);border-radius:50%;font-size:22px;flex:none}
+
+/* 입력칸 */
+.row{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.field{display:grid;gap:4px;min-width:0}
+.field > label,.legend{font-size:21px;font-weight:700}
+.req{font-family:var(--f-pen);color:var(--coral);font-size:22px;font-weight:400;margin-left:6px}
+.tip{font-family:var(--f-text);font-size:14.5px;color:var(--ink-2);margin:0;line-height:1.6}
+input[type=text],input[type=tel],input[type=month],textarea{
+  width:100%;min-height:46px;font-family:var(--f-text);font-size:16px;line-height:1.7;color:var(--ink);
+  background:var(--peach);border:2px dashed var(--peach-b);border-radius:8px;padding:9px 12px}
+textarea{min-height:92px;resize:vertical}
+input:focus,textarea:focus{border-style:solid;border-color:var(--coral);background:#fff}
+.age{font-family:var(--f-pen);color:var(--blue);font-size:23px;min-height:1.2em;line-height:1.2}
+.err{margin:0;color:var(--coral);font-weight:700;font-size:19px}
+fieldset{border:0;margin:0;padding:0;display:grid;gap:6px;min-width:0}
+
+/* 고르기 단추 */
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{position:relative}
+.chip input{position:absolute;opacity:0;width:1px;height:1px}
+.chip label{display:inline-flex;align-items:center;gap:8px;min-height:44px;border:2.5px solid var(--ink);background:#fff;border-radius:999px;padding:4px 16px 4px 10px;font-size:19px;font-weight:700;cursor:pointer;transition:transform .12s}
+.chip label small{font-family:var(--f-text);font-weight:400;font-size:13px;color:var(--ink-2)}
+.chip label:hover{transform:translateY(-2px)}
+.chip .cb{width:22px;height:22px;flex:none;position:relative;border:2.5px solid var(--ink);border-radius:3px;background:#fff}
+.chip input[type=radio] + label .cb{border-radius:50%}
+.chip input:checked + label{background:var(--pink-soft);border-color:var(--coral);color:var(--coral)}
+.chip input:checked + label small{color:var(--coral-d)}
+.chip input:checked + label .cb{border-color:var(--coral)}
+.chip input:checked + label .cb::after{content:'';position:absolute;left:3px;top:-9px;width:10px;height:19px;border-right:4px solid var(--coral);border-bottom:4px solid var(--coral);transform:rotate(40deg);border-radius:2px}
+.chip input:focus-visible + label{outline:3px solid var(--blue);outline-offset:3px}
+.scale{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px}
+.scale .chip label{width:100%;justify-content:center;padding-inline:6px}
+.scale-ends{display:flex;justify-content:space-between;font-family:var(--f-pen);font-size:21px;color:var(--ink-2)}
+
+/* 다 쓴 화면 */
+.paper{font-family:var(--f-text);font-size:15.5px;line-height:1.8;background:var(--peach);border:2px dashed var(--peach-b);border-radius:6px;padding:10px 16px;margin:0;white-space:pre-wrap}
+.paper::before{content:'선생님께 갈 내용';display:block;font-family:var(--f-pen);font-size:23px;color:var(--coral);line-height:1.2;margin-bottom:4px}
+.momsend{display:flex;flex-wrap:wrap;align-items:center;gap:10px 14px;padding:10px 14px;border:2.5px solid var(--pink-b);background:var(--pink-soft);border-radius:10px}
+.momsend .chr{width:62px}
+.momsend > div{flex:1 1 180px;display:grid}
+.momsend b{font-size:22px} .momsend span{font-size:17px;color:var(--ink-2)}
+
+/* 단추 */
+.btn{display:inline-flex;align-items:center;justify-content:center;min-height:44px;border:2.5px solid var(--ink);background:#fff;border-radius:999px;padding:5px 20px;font-size:21px;font-weight:700;transition:transform .12s;text-decoration:none;color:var(--ink)}
+.btn:hover{transform:translateY(-2px)}
+.btn:active{transform:none}
+.btn.pri{background:var(--coral);border-color:var(--coral);color:#fff}
+.link{background:none;border:0;padding:6px 4px;font-family:var(--f-pen);font-size:22px;color:var(--ink-2);text-decoration:underline;text-underline-offset:4px;min-height:44px}
+.link:hover{color:var(--coral)}
+
+.nav{position:fixed;left:0;right:0;bottom:0;background:#fff;border-top:2.5px dashed var(--peach-b);padding:10px 16px calc(10px + env(safe-area-inset-bottom,0px));z-index:10}
+.nav-in{max-width:860px;margin:0 auto;display:flex;align-items:center;gap:10px}
+.nav-in .pri{margin-left:auto;min-width:150px}
+.nav-cnt{font-family:var(--f-pen);font-size:22px;color:var(--ink-2)}
+
+.note{margin-top:22px;font-size:18px;border:2.5px dashed var(--peach-b);border-radius:6px;padding:12px 18px}
+.note summary{cursor:pointer;font-weight:700}
+.note p{margin:8px 0;font-family:var(--f-text);font-size:15px;line-height:1.7}
+.foot a.link{display:inline-flex;align-items:center}
+.foot{display:flex;flex-wrap:wrap;gap:4px 16px;align-items:center;justify-content:space-between;margin-top:14px;font-size:17px;color:var(--ink-2)}
+
+/* 보내기 창 */
+.send-back{position:fixed;inset:0;z-index:50;background:rgba(52,42,42,.35);display:grid;place-items:center;padding:16px;animation:pop .15s ease}
+.send{width:min(520px,100%);max-height:calc(100% - 8px);overflow:auto;background:#fff;border:3px solid var(--ink);border-radius:14px;padding:16px 18px 18px}
+.send-top{display:flex;align-items:flex-end;gap:6px;margin-bottom:10px}
+.send-top .chr{width:80px}
+.send-top .bubble{flex:1;margin-left:12px;font-size:22px}
+.send-steps{list-style:none;margin:0 0 10px;padding:0;display:grid;gap:4px;font-size:19px}
+.send-steps li{display:flex;align-items:center;gap:8px}
+.send-steps .circ{width:28px;height:28px;font-size:17px}
+.send textarea{font-size:14.5px;line-height:1.6;min-height:200px}
+.send-msg{min-height:1.4em;margin:6px 0 0;color:var(--coral);font-weight:700}
+.acts{display:flex;justify-content:flex-end;gap:10px;margin-top:12px;flex-wrap:wrap}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+
+@media (max-width:760px){
+  .hero{grid-template-columns:minmax(0,1fr)}
+  .hero-c{flex-direction:row;justify-content:center;align-items:flex-end}
+  .hero-c .chr{width:84px}
+  .hero-c .bubble{font-size:17px;padding:10px 16px}
+  .row{grid-template-columns:minmax(0,1fr)}
+  .ask .chr{width:64px}
+  .ask .bubble{font-size:20px}
+  .nav-cnt{display:none}
+}
+@media print{
+  .nav,.foot,.note,.rail-wrap,.hero-c,.ask,.momsend,.acts,.send-back{display:none!important}
+  .wrap{padding:0;max-width:none}
+  .card{border:0;padding:0;animation:none}
+  .paper{font-size:13pt;background:#fff;border:1.5px solid #342A2A}
+  .brand{font-size:28pt}
+}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{transition:none!important;animation:none!important}
+}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header class="hero">
+    <div>
+      <p class="kicker">방문 몬테소리 · 구달이 선생님</p>
+      <h1 class="brand">포텐시아 몬테소리 <span class="red hl">사전 상담지</span></h1>
+      <p class="sub">우리 아이 <span class="hl-y">기질</span>이랑 <span class="hl-g">바라는 점</span>을 먼저 알려 주세요!</p>
+    </div>
+    <div class="hero-c">
+      <div class="bubble b" id="greet">안녕하세요! 첫 수업 전에<br>아이를 먼저 알고 싶어요.</div>
+      <span class="doodle d1">반가워요~</span>
+      <span class="pair" id="heroPair"></span>
+    </div>
+  </header>
+
+  <div class="rail-wrap"><ol class="rail" id="rail" aria-label="작성 단계"></ol></div>
+
+  <form id="form" novalidate>
+    <!-- 1 -->
+    <section class="card" data-step="1">
+      <div class="ask"><span class="chr" data-who="songi" data-mood="happy"></span><div class="bubble l pink">어떤 아이인지 소개해 주세요!<small>이름과 태어난 달만 꼭 적어 주시면 돼요.</small></div></div>
+      <div class="row">
+        <div class="field">
+          <label for="childName">아이 이름(애칭)<span class="req">꼭!</span></label>
+          <input type="text" id="childName" autocomplete="off" placeholder="예) 김하온 / 온이">
+        </div>
+        <div class="field">
+          <label for="birth">태어난 달<span class="req">꼭!</span></label>
+          <input type="month" id="birth">
+          <div class="age tnum" id="age" aria-live="polite"></div>
+        </div>
+      </div>
+      <fieldset><span class="legend">형제 관계</span><div class="chips" id="siblings"></div></fieldset>
+      <div class="field">
+        <label for="daycare">지금 다니는 곳</label>
+        <input type="text" id="daycare" placeholder="예) 가정 보육 / 어린이집 오전반">
+      </div>
+      <p class="err" id="err1" hidden></p>
+    </section>
+
+    <!-- 2 -->
+    <section class="card" data-step="2" hidden>
+      <div class="ask"><span class="chr" data-who="mongi" data-mood="think"></span><div class="bubble l">우리 아이는 어떤 편인가요?<small>정답은 없어요. 느끼시는 그대로, 여러 개 골라도 돼요.</small></div></div>
+      <fieldset><span class="legend">기질</span><div class="chips" id="temper"></div></fieldset>
+      <fieldset>
+        <span class="legend">처음 보는 선생님과 친해지는 데 걸리는 시간</span>
+        <div class="scale chips" id="warmup"></div>
+        <div class="scale-ends"><span>금방 친해져요</span><span>시간이 꽤 걸려요</span></div>
+      </fieldset>
+      <div class="field">
+        <label for="loves">요즘 푹 빠져 있는 것</label>
+        <textarea id="loves" placeholder="예) 공룡 그림책, 물 따르기 놀이, 블록 쌓기"></textarea>
+      </div>
+      <fieldset><span class="legend">집중이 잘 되는 시간대</span><div class="chips" id="focusTime"></div></fieldset>
+    </section>
+
+    <!-- 3 -->
+    <section class="card" data-step="3" hidden>
+      <div class="ask"><span class="chr" data-who="bookie" data-mood="wow"></span><div class="bubble l">수업에서 함께 키우고 싶은 부분은요?<small>몬테소리 다섯 영역과 가베·발도르프·그림책을 아이에 맞게 섞어요.</small></div></div>
+      <fieldset><span class="legend">관심 있는 영역</span><div class="chips" id="areas"></div></fieldset>
+      <div class="field">
+        <label for="wish">엄마의 바람</label>
+        <textarea id="wish" placeholder="예) 스스로 해 보려는 마음이 커졌으면 좋겠어요. 차분히 앉아 끝까지 해 보는 경험이 많았으면 해요."></textarea>
+      </div>
+    </section>
+
+    <!-- 4 -->
+    <section class="card" data-step="4" hidden>
+      <div class="ask"><span class="chr" data-who="songi" data-mood="think"></span><div class="bubble l pink">선생님이 꼭 알아야 할 것이 있나요?<small>작은 교구와 먹는 재료를 쓰는 수업이 있어서 미리 여쭤봐요.</small></div></div>
+      <div class="field">
+        <label for="caution">조심해야 할 재료·습관</label>
+        <textarea id="caution" placeholder="예) 작은 구슬을 입에 넣는 습관이 있어요 / 땅콩 조심"></textarea>
+      </div>
+      <div class="field">
+        <label for="anxious">불안해하거나 싫어하는 상황</label>
+        <textarea id="anxious" placeholder="예) 큰 소리, 엄마가 방을 나가는 것, 손에 뭐가 묻는 것"></textarea>
+      </div>
+      <div class="field">
+        <label for="calm">속상할 때 마음이 풀리는 방법</label>
+        <input type="text" id="calm" placeholder="예) 꼭 안아 주기, 좋아하는 그림책 읽어 주기">
+      </div>
+    </section>
+
+    <!-- 5 -->
+    <section class="card" data-step="5" hidden>
+      <div class="ask"><span class="chr" data-who="mongi" data-mood="happy"></span><div class="bubble l">언제 만나면 좋을까요?<small>편한 요일과 연락처를 알려 주세요.</small></div></div>
+      <fieldset><span class="legend">수업 희망 요일</span><div class="chips" id="days"></div></fieldset>
+      <fieldset><span class="legend">희망 시간대</span><div class="chips" id="slot"></div></fieldset>
+      <div class="row">
+        <div class="field">
+          <label for="parent">보호자 이름</label>
+          <input type="text" id="parent" placeholder="예) 하온 엄마">
+        </div>
+        <div class="field">
+          <label for="phone">연락처</label>
+          <input type="tel" id="phone" inputmode="tel" placeholder="010-0000-0000">
+        </div>
+      </div>
+      <div class="field">
+        <label for="area">사는 동네</label>
+        <input type="text" id="area" placeholder="예) 수성구 범어동">
+      </div>
+    </section>
+
+    <!-- 6 -->
+    <section class="card" data-step="6" hidden>
+      <div class="ask"><span class="chr" data-who="songi" data-mood="cheer"></span><div class="bubble l pink">다 썼어요! 고마워요~<small>고칠 곳이 있으면 아래 ‘이전’을 눌러 돌아가세요.</small></div></div>
+      <pre class="paper" id="summary" tabindex="0"></pre>
+      <div class="momsend">
+        <span class="chr" data-who="bookie" data-mood="cheer"></span>
+        <div><b>구달이 선생님께 보내기</b><span>복사해서 카톡이나 문자로 보내 주세요.</span></div>
+        <button type="button" class="btn pri" id="sendBtn">💌 선생님께 보내기</button>
+      </div>
+      <div class="acts" style="justify-content:flex-start;margin-top:0">
+        <button type="button" class="btn" id="printFilled">🖨 쓴 내용 인쇄하기</button>
+        <button type="button" class="btn" id="restartBtn">새로 쓰기</button>
+      </div>
+    </section>
+  </form>
+
+  <div class="foot">
+    <span>쓰던 내용은 이 기기에만 잠깐 저장돼요.</span>
+    <span style="display:inline-flex;gap:12px;flex-wrap:wrap"><a class="link" href="./print.html">🖨 종이로 인쇄하기</a><button type="button" class="link" id="sampleBtn">예시로 채워 보기</button></span>
+  </div>
+
+  <details class="note">
+    <summary>선생님·부모님께</summary>
+    <p>포텐시아 몬테소리는 몬테소리 교구, 발도르프, 가베, 그림책을 아이 기질에 맞춰 수업하는 방문 수업이에요. 첫 만남 전에 이 상담지를 받아 아이에게 맞는 교구와 그림책을 준비하고, 정서적으로 편안한 첫 수업을 만들어요.</p>
+    <p>‘선생님께 보내기’를 누르면 적은 내용이 한 번에 정리되고, 복사해서 카톡이나 문자로 보낼 수 있어요. 적은 내용은 이 기기의 브라우저에만 잠깐 저장되고, 다른 곳으로 저절로 전송되지 않아요.</p>
+  </details>
+</div>
+
+<nav class="nav" aria-label="단계 이동">
+  <div class="nav-in">
+    <button type="button" class="btn" id="prevBtn">이전</button>
+    <span class="nav-cnt tnum" id="navCnt"></span>
+    <button type="button" class="btn pri" id="nextBtn">다음</button>
+  </div>
+</nav>
+
+<script>
+(function(){
+  const $ = s => document.querySelector(s);
+  const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+  /* ---------- 캐릭터 (글분석 학습지와 같은 송이·몽이·책돌이) ---------- */
+  const INK = '#342A2A';
+  const SW = 'stroke="' + INK + '" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"';
+  function eyes(m, lx, rx, y){
+    if (m === 'cheer') return `<path d="M${lx-5} ${y+2} q5 -8 10 0 M${rx-5} ${y+2} q5 -8 10 0" fill="none" ${SW}/>`;
+    const ry = m === 'wow' ? 8 : 6.5, rxx = m === 'wow' ? 6 : 5, dy = m === 'think' ? -2 : 0;
+    return [lx, rx].map(x => `<ellipse cx="${x}" cy="${y + dy}" rx="${rxx}" ry="${ry}" fill="${INK}"/><circle cx="${x + 1.8}" cy="${y + dy - 2.8}" r="2" fill="#fff"/>`).join('');
+  }
+  function mouth(m, cx, y){
+    if (m === 'wow') return `<ellipse cx="${cx}" cy="${y + 2}" rx="5" ry="6" fill="#E9707F" ${SW}/>`;
+    if (m === 'think') return `<path d="M${cx-5} ${y+2} h9" fill="none" ${SW}/>`;
+    if (m === 'cheer') return `<path d="M${cx-8} ${y-1} q8 13 16 0 z" fill="#E9707F" ${SW}/>`;
+    return `<path d="M${cx-7} ${y} q7 8 14 0" fill="none" ${SW}/>`;
+  }
+  function extras(m){
+    if (m === 'wow' || m === 'cheer') return `<path d="M104 22 l3 8 l8 3 l-8 3 l-3 8 l-3 -8 l-8 -3 l8 -3z" fill="#FFD66B" ${SW}/><path d="M14 36 l2 5 l5 2 l-5 2 l-2 5 l-2 -5 l-5 -2 l5 -2z" fill="#F5A3B7" stroke="${INK}" stroke-width="2"/>`;
+    if (m === 'think') return `<text x="98" y="30" font-family="Gaegu,sans-serif" font-weight="700" font-size="30" fill="${INK}">?</text>`;
+    return '';
+  }
+  function songi(m){
+    const petals = [0, 60, 120, 180, 240, 300].map(a => { const r = (a - 90) * Math.PI / 180; return `<circle cx="${(60 + 33 * Math.cos(r)).toFixed(1)}" cy="${(62 + 33 * Math.sin(r)).toFixed(1)}" r="19" fill="#FFC6D4" ${SW}/>`; }).join('');
+    const arms = m === 'cheer' ? `<path d="M26 92 q-10 -14 -6 -26" fill="none" ${SW}/><circle cx="20" cy="64" r="6" fill="#FFF3EA" ${SW}/><path d="M94 92 q10 -14 6 -26" fill="none" ${SW}/><circle cx="100" cy="64" r="6" fill="#FFF3EA" ${SW}/>` : '';
+    return `<svg viewBox="0 0 120 124" aria-hidden="true">${arms}
+      <path d="M38 112 q22 14 44 0 l-4 -14 h-36z" fill="#8FB4F0" ${SW}/>${petals}
+      <circle cx="60" cy="64" r="31" fill="#FFF3EA" ${SW}/>
+      <path d="M44 40 q16 -10 32 0 q-6 8 -16 6 q-10 3 -16 -6z" fill="#FFC6D4" ${SW}/>
+      <path d="M60 22 q2 -10 10 -12 q-2 9 -10 12z" fill="#A6D98A" ${SW}/>
+      ${eyes(m, 48, 72, 64)}
+      <ellipse cx="40" cy="76" rx="6" ry="3.6" fill="#F7A6B8" opacity=".8"/><ellipse cx="80" cy="76" rx="6" ry="3.6" fill="#F7A6B8" opacity=".8"/>
+      ${mouth(m, 60, 77)}${extras(m)}</svg>`;
+  }
+  function mongi(m){
+    const wing = m === 'cheer' ? `<path d="M26 70 q-16 -10 -12 -26 q12 6 16 20z" fill="#FFE07F" ${SW}/><path d="M94 70 q16 -10 12 -26 q-12 6 -16 20z" fill="#FFE07F" ${SW}/>`
+      : `<path d="M28 74 q-12 4 -10 16 q10 -2 14 -10z" fill="#FFE07F" ${SW}/><path d="M92 74 q12 4 10 16 q-10 -2 -14 -10z" fill="#FFE07F" ${SW}/>`;
+    const pencil = m === 'think' || m === 'happy' ? `<g transform="rotate(28 100 86)"><rect x="94" y="62" width="11" height="36" rx="2" fill="#7FB6F0" ${SW}/><path d="M94 98 l5.5 11 l5.5 -11z" fill="#FFE3C4" ${SW}/><rect x="94" y="57" width="11" height="7" rx="2" fill="#F5A3B7" ${SW}/></g>` : '';
+    return `<svg viewBox="0 0 120 124" aria-hidden="true">
+      <path d="M48 112 v6 M44 118 h8 M72 112 v6 M68 118 h8" fill="none" ${SW}/>${wing}
+      <ellipse cx="60" cy="74" rx="36" ry="38" fill="#FFE590" ${SW}/>
+      <path d="M54 37 q-4 -12 4 -16 q2 8 2 15 M62 36 q6 -11 14 -8 q-6 5 -10 10" fill="#FFE590" ${SW}/>
+      ${eyes(m, 47, 73, 68)}
+      <path d="M54 80 l6 7 l6 -7z" fill="#F6A13D" ${SW}/>
+      <ellipse cx="38" cy="84" rx="6" ry="3.5" fill="#F7A6B8" opacity=".8"/><ellipse cx="82" cy="84" rx="6" ry="3.5" fill="#F7A6B8" opacity=".8"/>
+      ${m === 'wow' || m === 'cheer' ? mouth(m, 60, 92) : ''}${pencil}${extras(m)}</svg>`;
+  }
+  function bookie(m){
+    return `<svg viewBox="0 0 120 124" aria-hidden="true">
+      <path d="M44 106 l-4 12 M76 106 l4 12" fill="none" ${SW}/>
+      <path d="M60 32 q-24 -12 -48 -4 v72 q24 -8 48 4z" fill="#E5D4F6" ${SW}/>
+      <path d="M60 32 q24 -12 48 -4 v72 q-24 -8 -48 4z" fill="#F3E9FC" ${SW}/>
+      <path d="M22 44 q14 -4 28 2 M22 56 q14 -4 28 2 M70 46 q14 -6 28 -2" fill="none" stroke="#B9A3D6" stroke-width="2" stroke-linecap="round"/>
+      ${eyes(m, 76, 94, 66)}
+      <ellipse cx="72" cy="78" rx="5" ry="3" fill="#F7A6B8" opacity=".8"/><ellipse cx="100" cy="78" rx="5" ry="3" fill="#F7A6B8" opacity=".8"/>
+      ${mouth(m, 85, 78)}${extras(m)}</svg>`;
+  }
+  const CHAR = { songi, mongi, bookie };
+  const ch = (who, mood, cls = '') => `<span class="chr ${cls}">${CHAR[who](mood)}</span>`;
+  document.querySelectorAll('.chr[data-who]').forEach(el => { el.innerHTML = CHAR[el.dataset.who](el.dataset.mood); });
+  $('#heroPair').innerHTML = ch('mongi', 'happy', 'bob') + ch('songi', 'cheer');
+
+  /* ---------- 고르기 항목 ---------- */
+  const OPTS = {
+    siblings:{type:'radio', items:['외동','첫째','둘째','막내','쌍둥이']},
+    temper:{type:'checkbox', items:[['순한 편','잘 따르고 적응이 빨라요'],['천천히 적응','지켜본 뒤 다가가요'],['예민한 편','소리·촉감에 민감해요'],['활동적','몸으로 탐색해요'],['차분함','오래 앉아 있어요'],['호기심 많음','질문이 많아요']]},
+    warmup:{type:'radio', items:['1','2','3','4','5']},
+    focusTime:{type:'radio', items:['오전','낮잠 후','오후','저녁']},
+    areas:{type:'checkbox', items:['일상생활','감각','언어','수','문화','가베','발도르프','그림책']},
+    days:{type:'checkbox', items:['월','화','수','목','금','토']},
+    slot:{type:'radio', items:['오전 10–12시','오후 1–3시','오후 3–5시','오후 5시 이후']}
+  };
+  const TEXT_IDS = ['childName','birth','daycare','loves','wish','caution','anxious','calm','parent','phone','area'];
+  const STEPS = ['아이 소개','기질과 성향','바라는 점','주의할 점','수업 일정','보내기'];
+  const KEY = 'ddm-montessori-intake-v1';
+  const form = $('#form');
+  let step = 1, maxSeen = 1;
+
+  Object.keys(OPTS).forEach(name => {
+    const o = OPTS[name];
+    $('#' + name).innerHTML = o.items.map((it, i) => {
+      const val = Array.isArray(it) ? it[0] : it, sub = Array.isArray(it) ? it[1] : '';
+      const id = name + '-' + i;
+      return `<div class="chip"><input type="${o.type}" name="${name}" id="${id}" value="${esc(val)}"><label for="${id}"><span class="cb"></span>${esc(val)}${sub ? ` <small>${esc(sub)}</small>` : ''}</label></div>`;
+    }).join('');
+  });
+
+  const getVals = n => [...form.querySelectorAll(`input[name="${n}"]`)].filter(x => x.checked).map(x => x.value);
+  function collect(){
+    const d = {};
+    TEXT_IDS.forEach(id => d[id] = $('#' + id).value.trim());
+    Object.keys(OPTS).forEach(n => d[n] = getVals(n));
+    return d;
+  }
+  function apply(d){
+    if (!d) return;
+    TEXT_IDS.forEach(id => { if (d[id] != null) $('#' + id).value = d[id]; });
+    Object.keys(OPTS).forEach(n => { const v = d[n] || []; form.querySelectorAll(`input[name="${n}"]`).forEach(x => x.checked = v.includes(x.value)); });
+    updateAge();
+  }
+  const save = () => { try { localStorage.setItem(KEY, JSON.stringify(collect())); } catch (e) {} };
+  const load = () => { try { const s = localStorage.getItem(KEY); return s ? JSON.parse(s) : null; } catch (e) { return null; } };
+
+  function months(v){
+    if (!/^\d{4}-\d{2}$/.test(v)) return null;
+    const [y, m] = v.split('-').map(Number), now = new Date();
+    const n = (now.getFullYear() - y) * 12 + (now.getMonth() + 1 - m);
+    return n >= 0 ? n : null;
+  }
+  function ageText(v){
+    const n = months(v); if (n == null) return '';
+    const [y, m] = v.split('-').map(Number);
+    return `${y}년 ${m}월생 · ${n}개월 (만 ${Math.floor(n / 12)}세)`;
+  }
+  function updateAge(){ $('#age').textContent = ageText($('#birth').value); }
+
+  const line = (label, val) => (Array.isArray(val) ? val.length : val) ? `· ${label}: ${Array.isArray(val) ? val.join(', ') : val}\n` : '';
+  function buildText(){
+    const d = collect();
+    let t = '[포텐시아 몬테소리 사전 상담지]\n\n';
+    t += '■ 아이 소개\n' + line('이름', d.childName) + line('나이', ageText(d.birth)) + line('형제 관계', d.siblings) + line('지금 다니는 곳', d.daycare);
+    t += '\n■ 기질과 성향\n' + line('기질', d.temper) + line('친해지는 데 걸리는 시간', d.warmup.length ? d.warmup[0] + ' / 5' : '') + line('요즘 푹 빠진 것', d.loves) + line('집중 잘 되는 시간', d.focusTime);
+    t += '\n■ 바라는 점\n' + line('관심 영역', d.areas) + line('엄마의 바람', d.wish);
+    t += '\n■ 주의할 점\n' + line('조심할 재료·습관', d.caution) + line('불안해하는 상황', d.anxious) + line('마음이 풀리는 방법', d.calm);
+    t += '\n■ 수업 일정\n' + line('희망 요일', d.days) + line('희망 시간', d.slot) + line('보호자', d.parent) + line('연락처', d.phone) + line('동네', d.area);
+    return t.replace(/■ [^\n]+\n(?=\n|$)/g, '').replace(/\n{3,}/g, '\n\n').trim();
+  }
+
+  function renderRail(){
+    $('#rail').innerHTML = STEPS.map((s, i) => {
+      const n = i + 1, cls = n === step ? 'on' : n < maxSeen || (n < step) ? 'fin' : '';
+      return `<li class="${cls}"${n === step ? ' aria-current="step"' : ''}>${s}</li>`;
+    }).join('');
+  }
+  const GREET = ['안녕하세요! 첫 수업 전에<br>아이를 먼저 알고 싶어요.', '어떤 아이인지<br>궁금해요!', '바라는 점을<br>꼭 담아 볼게요.', '안전하게 준비할게요.', '거의 다 왔어요!', '정성껏 준비해서<br>만나러 갈게요!'];
+  function show(n){
+    step = n; maxSeen = Math.max(maxSeen, n);
+    form.querySelectorAll('[data-step]').forEach(s => s.hidden = +s.dataset.step !== n);
+    renderRail();
+    $('#greet').innerHTML = GREET[n - 1];
+    $('#prevBtn').hidden = n === 1;
+    $('#nextBtn').hidden = n === 6;
+    $('#nextBtn').textContent = n === 5 ? '다 썼어요!' : '다음';
+    $('#navCnt').textContent = n < 6 ? `${n} / 5` : '';
+    if (n === 6) $('#summary').textContent = buildText();
+    window.scrollTo({ top: 0, behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
+  }
+
+  function validate1(){
+    const msgs = [];
+    if (!$('#childName').value.trim()) msgs.push('아이 이름을 적어 주세요.');
+    if (months($('#birth').value) == null) msgs.push('태어난 달을 골라 주세요.');
+    $('#err1').textContent = msgs.join(' '); $('#err1').hidden = !msgs.length;
+    if (msgs.length) ($('#childName').value.trim() ? $('#birth') : $('#childName')).focus();
+    return !msgs.length;
+  }
+
+  $('#nextBtn').onclick = () => { if (step === 1 && !validate1()) return; save(); show(step + 1); };
+  $('#prevBtn').onclick = () => show(step - 1);
+  form.addEventListener('input', e => { if (e.target.id === 'birth') updateAge(); save(); });
+  form.addEventListener('change', save);
+  form.addEventListener('submit', e => e.preventDefault());
+
+  function openSend(text){
+    const old = $('#sendDlg'); if (old) old.remove();
+    const wrap = document.createElement('div');
+    wrap.id = 'sendDlg'; wrap.className = 'send-back';
+    wrap.innerHTML = `<div class="send" role="dialog" aria-modal="true" aria-labelledby="sendT">
+      <div class="send-top">${ch('songi', 'cheer')}<div class="bubble l pink" id="sendT">구달이 선생님께 보내 주세요!</div></div>
+      <ol class="send-steps">
+        <li><span class="circ">1</span> <b>복사하기</b>를 눌러요</li>
+        <li><span class="circ">2</span> 카톡에서 선생님 대화방을 열어요</li>
+        <li><span class="circ">3</span> 길게 눌러 <b>붙여넣기</b> → 보내기!</li>
+      </ol>
+      <label class="sr" for="sendTxt">보낼 내용</label>
+      <textarea id="sendTxt" readonly rows="9">${esc(text)}</textarea>
+      <p class="send-msg" id="sendMsg" aria-live="polite"></p>
+      <div class="acts">
+        <button type="button" class="btn" id="sendClose">닫기</button>
+        <a class="btn" id="sendSms" href="sms:?&body=${encodeURIComponent(text)}">문자로 보내기</a>
+        <button type="button" class="btn pri" id="sendCopy">복사하기</button>
+      </div>
+    </div>`;
+    document.body.appendChild(wrap);
+    const ta = $('#sendTxt'), msg = $('#sendMsg');
+    const close = () => { wrap.remove(); document.removeEventListener('keydown', onEsc); $('#sendBtn').focus(); };
+    const onEsc = e => { if (e.key === 'Escape') close(); };
+    document.addEventListener('keydown', onEsc);
+    wrap.addEventListener('click', e => { if (e.target === wrap) close(); });
+    $('#sendClose').onclick = close;
+    $('#sendCopy').onclick = () => {
+      const fallback = () => { ta.focus(); ta.select(); ta.setSelectionRange(0, ta.value.length); msg.textContent = '글이 선택됐어요. 길게 누르거나 Ctrl+C로 복사해 주세요.'; };
+      try {
+        navigator.clipboard.writeText(text).then(() => { msg.textContent = '복사했어요! 이제 카톡에 붙여 넣어 선생님께 보내 주세요.'; $('#sendCopy').textContent = '복사 완료 ✔'; }, fallback);
+      } catch (e) { fallback(); }
+    };
+    $('#sendSms').addEventListener('click', () => { msg.textContent = '문자 앱이 열리지 않으면 복사하기를 눌러 주세요.'; });
+    $('#sendCopy').focus();
+  }
+  $('#sendBtn').onclick = () => openSend(buildText());
+
+  let armed = false;
+  $('#restartBtn').onclick = function(){
+    if (!armed){ armed = true; this.textContent = '한 번 더 누르면 다 지워져요'; setTimeout(() => { armed = false; this.textContent = '새로 쓰기'; }, 3000); return; }
+    armed = false; this.textContent = '새로 쓰기';
+    form.reset(); updateAge(); try { localStorage.removeItem(KEY); } catch (e) {}
+    maxSeen = 1; show(1);
+  };
+
+  $('#sampleBtn').onclick = () => {
+    apply({childName:'(예시) 하온', birth:'2023-11', daycare:'가정 보육', siblings:['첫째'],
+      temper:['천천히 적응','호기심 많음'], warmup:['4'], loves:'공룡 그림책, 물 따르기 놀이', focusTime:['오전'],
+      areas:['일상생활','감각','그림책'], wish:'스스로 해 보려는 마음이 커졌으면 좋겠어요.',
+      caution:'작은 구슬을 입에 넣는 습관이 있어요', anxious:'엄마가 방을 나가는 것', calm:'꼭 안아 주기',
+      days:['화','목'], slot:['오전 10–12시'], parent:'(예시) 하온 엄마', phone:'010-0000-0000', area:'(예시) 수성구 범어동'});
+    save(); $('#err1').hidden = true;
+    if (step === 6) $('#summary').textContent = buildText();
+  };
+
+  $('#printFilled').onclick = () => window.print();
+  apply(load());
+  show(1);
+})();
+</script>
+</body>
+</html>

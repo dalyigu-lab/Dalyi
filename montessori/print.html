@@ -1,0 +1,192 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>포텐시아 몬테소리 사전 상담지 (인쇄용)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gaegu:wght@400;700&family=Nanum+Pen+Script&family=Gowun+Dodum&display=swap">
+<style>
+:root{
+  --ink:#342A2A; --ink-2:#6C5F5F; --ink-3:#A89B9B;
+  --pink-soft:#FDE7ED; --pink-b:#EE9DB1; --lav-b:#E2A6D7; --peach:#FFF3E6; --peach-b:#F7CDA4; --sky-b:#9DC4F0;
+  --coral:#E3544B; --hl:#FFD2DC; --hl-y:#FFE7A3; --hl-g:#D9F0B8; --rule:#D9CFCF;
+  --f-hand:'Gaegu','Gowun Dodum','Apple SD Gothic Neo','Malgun Gothic',sans-serif;
+  --f-pen:'Nanum Pen Script','Gaegu',cursive;
+  --f-text:'Gowun Dodum','Apple SD Gothic Neo','Malgun Gothic',sans-serif;
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:#EFEAEA;color:var(--ink)}
+body{font-family:var(--f-hand);font-size:15px;line-height:1.45;word-break:keep-all;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+.bar{position:sticky;top:0;z-index:5;background:#fff;border-bottom:2.5px dashed var(--peach-b);padding:10px 16px;display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:center}
+.bar p{margin:0;font-size:17px;color:var(--ink-2)}
+.btn{border:2.5px solid var(--ink);background:#fff;border-radius:999px;padding:5px 20px;font:inherit;font-size:19px;font-weight:700;cursor:pointer;color:var(--ink);text-decoration:none}
+.btn.pri{background:var(--coral);border-color:var(--coral);color:#fff}
+.btn:focus-visible{outline:3px solid #4568CF;outline-offset:3px}
+
+.page{width:210mm;min-height:297mm;margin:16px auto;background:#fff;padding:10mm 12mm;display:flex;flex-direction:column;gap:3mm;box-shadow:0 2px 10px rgba(52,42,42,.12)}
+.head{display:flex;align-items:flex-end;justify-content:space-between;gap:10px;border-bottom:2.5px solid var(--ink);padding-bottom:3mm}
+.kicker{margin:0;font-size:14px;color:var(--ink-2)}
+h1{margin:1mm 0 0;font-size:28px;line-height:1.05}
+h1 .red{color:var(--coral);background:linear-gradient(to bottom,transparent 55%,var(--hl) 55%,var(--hl) 92%,transparent 92%);padding:0 3px}
+.tower{display:flex;flex-direction:column;align-items:center;gap:2px}
+.tower i{display:block;height:7px;border-radius:1.5px;background:var(--pink-b)}
+.meta{display:flex;gap:6mm;font-size:15px}
+.meta span{display:inline-block;min-width:26mm;border-bottom:1.5px solid var(--ink)}
+.intro{margin:0;font-family:var(--f-text);font-size:12.5px;line-height:1.6;color:var(--ink-2)}
+
+.box{border:2.2px solid var(--c,var(--peach-b));border-radius:5px;padding:2.5mm 4mm 3mm;display:flex;flex-direction:column;gap:2mm;break-inside:avoid}
+.b1{--c:var(--pink-b)} .b2{--c:var(--peach-b)} .b3{--c:var(--lav-b)} .b4{--c:var(--sky-b)} .b5{--c:var(--pink-b)}
+.box h2{margin:0;font-size:19px;display:flex;align-items:center;gap:6px;line-height:1.1}
+.circ{display:inline-grid;place-items:center;width:26px;height:26px;border:2.2px solid var(--ink);border-radius:50%;font-size:16px;flex:none}
+.box h2 small{font-family:var(--f-pen);font-weight:400;font-size:19px;color:var(--coral);margin-left:4px}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:3mm 6mm}
+.q{display:grid;gap:1.2mm;min-width:0}
+.q > b{font-size:16px}
+.q > b em{font-style:normal;font-family:var(--f-pen);font-weight:400;color:var(--coral);font-size:17px;margin-left:3px}
+.line{height:7mm;border-bottom:1.4px solid var(--rule)}
+.inline{display:flex;align-items:flex-end;gap:2mm;font-size:15px}
+.inline .line{flex:1}
+.lines{display:grid}
+.chips{display:flex;flex-wrap:wrap;gap:1.6mm 4mm}
+.chip{display:inline-flex;align-items:center;gap:1.6mm;font-size:15.5px;white-space:nowrap}
+.chip small{font-family:var(--f-text);font-size:10.5px;color:var(--ink-2)}
+.sq{width:4.2mm;height:4.2mm;border:1.8px solid var(--ink);border-radius:1px;flex:none}
+.ro{border-radius:50%}
+.scale{display:flex;align-items:center;gap:3mm;font-size:14px;flex-wrap:wrap}
+.scale .n{display:inline-grid;place-items:center;width:7.5mm;height:7.5mm;border:1.8px solid var(--ink);border-radius:50%;font-size:15px;font-weight:700}
+.scale .end{font-family:var(--f-pen);font-size:17px;color:var(--ink-2)}
+.hint{margin:0;font-family:var(--f-text);font-size:11px;color:var(--ink-2)}
+
+.foot{margin-top:auto;display:flex;justify-content:space-between;align-items:flex-end;gap:10px;border-top:2px dashed var(--peach-b);padding-top:2.5mm;font-size:14px;color:var(--ink-2)}
+.foot b{color:var(--ink)}
+.sign{display:flex;align-items:flex-end;gap:2mm}
+.sign span{display:inline-block;width:32mm;border-bottom:1.5px solid var(--ink)}
+.consent{font-family:var(--f-text);font-size:11px;line-height:1.55;color:var(--ink-2);margin:0}
+.memo{flex:1;min-height:18mm;border:2px dashed var(--peach-b);background:var(--peach);border-radius:5px;padding:2.5mm 4mm}
+.memo b{font-family:var(--f-pen);font-weight:400;font-size:20px;color:var(--coral)}
+
+@page{size:A4;margin:0}
+@media print{
+  html,body{background:#fff}
+  .bar{display:none}
+  .page{margin:0;box-shadow:none;width:210mm;height:297mm;min-height:0;overflow:hidden;break-after:page}
+  .page:last-child{break-after:auto}
+}
+@media screen and (max-width:820px){
+  .page{width:auto;min-height:0;margin:12px 16px;padding:18px 16px}
+  .row{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+<div class="bar">
+  <p>A4 2장 · 손으로 써서 받는 상담지예요</p>
+  <button type="button" class="btn pri" id="printBtn">🖨 인쇄하기</button>
+  <a class="btn" href="./">온라인으로 작성하기</a>
+</div>
+
+<!-- PAGE 1 -->
+<section class="page">
+  <header class="head">
+    <div>
+      <p class="kicker">방문 몬테소리 · 구달이 선생님</p>
+      <h1>포텐시아 몬테소리 <span class="red">사전 상담지</span></h1>
+    </div>
+    <div class="tower" aria-hidden="true"><i style="width:10px"></i><i style="width:17px"></i><i style="width:24px"></i><i style="width:31px"></i><i style="width:38px"></i><i style="width:45px"></i></div>
+  </header>
+  <div class="meta"><div>작성일 <span></span></div><div>첫 수업일 <span></span></div></div>
+  <p class="intro">우리 아이를 먼저 알고 만나고 싶어요. 기질과 바라는 점을 알려 주시면 아이에게 맞춰 교구와 그림책을 준비할게요. 정답은 없으니 느끼시는 그대로 적어 주세요. 해당하는 곳에 ✔ 표시해 주세요(여러 개 가능).</p>
+
+  <div class="box b1">
+    <h2><span class="circ">1</span>아이 소개</h2>
+    <div class="row">
+      <div class="q"><b>아이 이름(애칭)<em>꼭!</em></b><div class="line"></div></div>
+      <div class="q"><b>태어난 날<em>꼭!</em></b><div class="inline"><div class="line"></div>년<div class="line"></div>월<div class="line"></div>일</div></div>
+    </div>
+    <div class="row">
+      <div class="q"><b>형제 관계</b>
+        <div class="chips"><span class="chip"><i class="sq ro"></i>외동</span><span class="chip"><i class="sq ro"></i>첫째</span><span class="chip"><i class="sq ro"></i>둘째</span><span class="chip"><i class="sq ro"></i>막내</span><span class="chip"><i class="sq ro"></i>쌍둥이</span></div>
+      </div>
+      <div class="q"><b>지금 다니는 곳</b><div class="line"></div></div>
+    </div>
+  </div>
+
+  <div class="box b2">
+    <h2><span class="circ">2</span>기질과 성향</h2>
+    <div class="q"><b>기질</b>
+      <div class="chips">
+        <span class="chip"><i class="sq"></i>순한 편 <small>잘 따르고 적응이 빨라요</small></span>
+        <span class="chip"><i class="sq"></i>천천히 적응 <small>지켜본 뒤 다가가요</small></span>
+        <span class="chip"><i class="sq"></i>예민한 편 <small>소리·촉감에 민감해요</small></span>
+        <span class="chip"><i class="sq"></i>활동적 <small>몸으로 탐색해요</small></span>
+        <span class="chip"><i class="sq"></i>차분함 <small>오래 앉아 있어요</small></span>
+        <span class="chip"><i class="sq"></i>호기심 많음 <small>질문이 많아요</small></span>
+      </div>
+    </div>
+    <div class="q"><b>처음 보는 선생님과 친해지는 데 걸리는 시간 <small style="font-weight:400;font-size:13px;color:var(--ink-2)">(하나에 ○)</small></b>
+      <div class="scale"><span class="end">금방 친해져요</span><span class="n">1</span><span class="n">2</span><span class="n">3</span><span class="n">4</span><span class="n">5</span><span class="end">시간이 꽤 걸려요</span></div>
+    </div>
+    <div class="q"><b>요즘 푹 빠져 있는 것</b><div class="lines"><div class="line"></div><div class="line"></div></div></div>
+    <div class="q"><b>집중이 잘 되는 시간대</b>
+      <div class="chips"><span class="chip"><i class="sq ro"></i>오전</span><span class="chip"><i class="sq ro"></i>낮잠 후</span><span class="chip"><i class="sq ro"></i>오후</span><span class="chip"><i class="sq ro"></i>저녁</span></div>
+    </div>
+  </div>
+
+  <div class="box b3">
+    <h2><span class="circ">3</span>바라는 점</h2>
+    <div class="q"><b>관심 있는 영역</b>
+      <p class="hint">몬테소리 다섯 영역과 가베·발도르프·그림책을 아이에 맞게 섞어 수업해요.</p>
+      <div class="chips"><span class="chip"><i class="sq"></i>일상생활</span><span class="chip"><i class="sq"></i>감각</span><span class="chip"><i class="sq"></i>언어</span><span class="chip"><i class="sq"></i>수</span><span class="chip"><i class="sq"></i>문화</span><span class="chip"><i class="sq"></i>가베</span><span class="chip"><i class="sq"></i>발도르프</span><span class="chip"><i class="sq"></i>그림책</span></div>
+    </div>
+    <div class="q"><b>엄마의 바람</b><div class="lines"><div class="line"></div><div class="line"></div><div class="line"></div></div></div>
+  </div>
+
+  <footer class="foot"><span>포텐시아 몬테소리 · 구달이 선생님 <b>010-9371-2100</b></span><span>1 / 2</span></footer>
+</section>
+
+<!-- PAGE 2 -->
+<section class="page">
+  <div class="box b4">
+    <h2><span class="circ">4</span>주의할 점<small>안전하게 준비할게요</small></h2>
+    <p class="hint">작은 교구와 먹는 재료를 쓰는 수업이 있어서 미리 여쭤봐요.</p>
+    <div class="q"><b>조심해야 할 재료·습관</b><div class="lines"><div class="line"></div><div class="line"></div></div></div>
+    <div class="q"><b>불안해하거나 싫어하는 상황</b><div class="lines"><div class="line"></div><div class="line"></div></div></div>
+    <div class="q"><b>속상할 때 마음이 풀리는 방법</b><div class="line"></div></div>
+  </div>
+
+  <div class="box b5">
+    <h2><span class="circ">5</span>수업 일정과 연락처</h2>
+    <div class="q"><b>수업 희망 요일</b>
+      <div class="chips"><span class="chip"><i class="sq"></i>월</span><span class="chip"><i class="sq"></i>화</span><span class="chip"><i class="sq"></i>수</span><span class="chip"><i class="sq"></i>목</span><span class="chip"><i class="sq"></i>금</span><span class="chip"><i class="sq"></i>토</span></div>
+    </div>
+    <div class="q"><b>희망 시간대</b>
+      <div class="chips"><span class="chip"><i class="sq ro"></i>오전 10–12시</span><span class="chip"><i class="sq ro"></i>오후 1–3시</span><span class="chip"><i class="sq ro"></i>오후 3–5시</span><span class="chip"><i class="sq ro"></i>오후 5시 이후</span></div>
+    </div>
+    <div class="row">
+      <div class="q"><b>보호자 이름</b><div class="line"></div></div>
+      <div class="q"><b>연락처</b><div class="line"></div></div>
+    </div>
+    <div class="q"><b>사는 동네</b><div class="line"></div></div>
+  </div>
+
+  <div class="box b2">
+    <h2><span class="circ">+</span>더 하고 싶은 말</h2>
+    <div class="lines"><div class="line"></div><div class="line"></div><div class="line"></div></div>
+  </div>
+
+  <div class="memo"><b>선생님 메모</b></div>
+
+  <p class="consent">적어 주신 내용은 수업 준비에만 쓰고, 다른 곳에 공유하지 않아요.</p>
+  <footer class="foot">
+    <div class="sign">보호자 확인 <span></span> (서명)</div>
+    <span>포텐시아 몬테소리 · 구달이 선생님 <b>010-9371-2100</b> · 2 / 2</span>
+  </footer>
+</section>
+
+<script>
+document.getElementById('printBtn').addEventListener('click', function(){ window.print(); });
+</script>
+</body>
+</html>
